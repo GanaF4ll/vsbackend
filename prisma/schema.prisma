@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model answers {
+  id          Int     @id @default(autoincrement())
+  question_id Int
+  content     String  @db.Text
+  valid       Boolean
+}
+
+model articles {
+  id          Int      @id @default(autoincrement())
+  author_id   Int
+  title       String   @db.Text
+  content     String   @db.Text
+  category_id Int
+  coverImage  String   @db.VarChar(50)
+  createdAt   DateTime @default(now()) @db.Timestamp(0)
+  modifiedAt  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model categories {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(20)
+}
+
+model chapters {
+  id             Int    @id @default(autoincrement())
+  formation_id   Int
+  title          String @db.VarChar(50)
+  content        String @db.Text
+  chapter_number Int
+}
+
+model formations {
+  id             Int      @id @default(autoincrement())
+  author_id      Int
+  title          String   @db.VarChar(50)
+  description    String   @db.Text
+  video          String   @db.VarChar(50)
+  category       String   @db.VarChar(50)
+  difficulty     String   @db.VarChar(10)
+  completionTime DateTime @db.Date
+  qualityRating  Int
+  coverImage     String   @db.VarChar(50)
+  createdAt      DateTime @default(now()) @db.Timestamp(0)
+  modifiedAt     DateTime @default(now()) @db.Timestamp(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model progressionformation {
+  user_id     Int
+  progression Int
+  grade       Int
+  chapter_id  Int
+
+  @@ignore
+}
+
+model questions {
+  id         Int    @id
+  question   String @db.Text
+  chapter_id Int
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model rating {
+  formation_id Int
+  grade        Int
+
+  @@ignore
+}
+
+model users {
+  id         Int       @id @default(autoincrement())
+  firstName  String    @db.VarChar(50)
+  lastName   String    @db.VarChar(50)
+  birthdate  DateTime  @db.Date
+  mail       String    @db.VarChar(50)
+  password   String    @db.VarChar(50)
+  role       String    @db.VarChar(10)
+  createdAt  DateTime  @default(now()) @db.Timestamp(0)
+  modifiedAt DateTime? @default(now()) @db.Timestamp(0)
+}
