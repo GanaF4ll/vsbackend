@@ -21,8 +21,8 @@ model articles {
   content     String   @db.Text
   category_id Int
   coverImage  String   @db.VarChar(50)
-  createdAt   DateTime @default(now()) @db.Timestamp(0)
-  modifiedAt  DateTime @default(now()) @db.Timestamp(0)
+  createdAt   DateTime @default(now()) @db.DateTime(0)
+  modifiedAt  DateTime @default(now()) @db.DateTime(0)
 }
 
 model categories {
@@ -49,8 +49,8 @@ model formations {
   completionTime DateTime @db.Date
   qualityRating  Int
   coverImage     String   @db.VarChar(50)
-  createdAt      DateTime @default(now()) @db.Timestamp(0)
-  modifiedAt     DateTime @default(now()) @db.Timestamp(0)
+  createdAt      DateTime @default(now()) @db.DateTime(0)
+  modifiedAt     DateTime @default(now()) @db.DateTime(0)
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -85,6 +85,6 @@ model users {
   mail       String    @db.VarChar(50)
   password   String    @db.VarChar(50)
   role       String    @db.VarChar(10)
-  createdAt  DateTime  @default(now()) @db.Timestamp(0)
-  modifiedAt DateTime? @default(now()) @db.Timestamp(0)
+  createdAt  DateTime  @default(now()) @db.DateTime(0)
+  modifiedAt DateTime? @default(now()) @db.DateTime(0)
 }
