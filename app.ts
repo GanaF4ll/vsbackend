@@ -9,11 +9,6 @@ require("dotenv").config({ path: "./.env" });
 const app = express();
 const port = process.env.PORT;
 
-// datasource db {
-//     provider = "mysql"
-//     url      = env("DATABASE_URL")
-//   }
-
 const connexion = mysql.createConnection({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
