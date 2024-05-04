@@ -1,10 +1,11 @@
 import express from "express";
 import mysql from "mysql";
+import dotenv from "dotenv";
 // import cors from "cors";
 
 // import userRouter from './routes/userRouter';
 
-require("dotenv").config({ path: "./.env" });
+dotenv.config();
 
 const app = express();
 const port = process.env.PORT;

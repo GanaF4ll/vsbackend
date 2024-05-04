@@ -2,10 +2,10 @@
   "name": "vsbackend",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "./src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.ts"
+    "start": "nodemon ./src/app.ts"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -24,6 +24,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.13.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
