@@ -19,3 +19,11 @@ export const listUsers = async (): Promise<User[]> => {
     },
   });
 };
+
+export const getUserById = async (id: number): Promise<User | null> => {
+  return db.users.findUnique({
+    where: {
+      id,
+    },
+  });
+};
