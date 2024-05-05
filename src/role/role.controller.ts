@@ -13,3 +13,11 @@ export const listRoles = async (): Promise<Role[]> => {
     },
   });
 };
+
+export const getRoleById = async (id: number): Promise<Role | null> => {
+  return db.role.findUnique({
+    where: {
+      id,
+    },
+  });
+};
