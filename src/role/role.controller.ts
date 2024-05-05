@@ -21,3 +21,13 @@ export const getRoleById = async (id: number): Promise<Role | null> => {
     },
   });
 };
+
+export const createRole = async (role: Omit<Role, "id">): Promise<Role> => {
+  const { name } = role;
+
+  return db.role.create({
+    data: {
+      name,
+    },
+  });
+};

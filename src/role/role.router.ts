@@ -28,3 +28,15 @@ roleRouter.get("/:id", async (req: Request, res: Response) => {
     return res.status(500).json({ message: err.message });
   }
 });
+
+roleRouter.post("/add", async (req: Request, res: Response) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array() });
+    }
+  } catch (error) {
+    const err = error as Error;
+    return res.status(500).json({ message: err.message });
+  }
+});
