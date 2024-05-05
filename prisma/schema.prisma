@@ -30,7 +30,7 @@ model Article {
 
 model Category {
   id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(20)
+  name      String    @db.VarChar(50)
   formations Formation[]
   articles  Article[]
 }

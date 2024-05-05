@@ -16,7 +16,7 @@ categoryRouter.get("/all", async (req: Request, res: Response) => {
   }
 });
 
-categoryRouter.get("/", async (req: Request, res: Response) => {
+categoryRouter.get("/:id", async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const category = await CategoryController.getCategoryById(id);
@@ -28,7 +28,7 @@ categoryRouter.get("/", async (req: Request, res: Response) => {
 });
 
 categoryRouter.post(
-  "/",
+  "/add",
   body("name").isString(),
   async (req: Request, res: Response) => {
     const errors = validationResult(req);
