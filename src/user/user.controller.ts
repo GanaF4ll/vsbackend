@@ -53,3 +53,29 @@ export const createUser = async (user: Omit<User, "id">): Promise<User> => {
     },
   });
 };
+
+export async function updateUser(
+  user: Omit<User, "id">,
+  id: number
+): Promise<User> {
+  const { firstName, lastName, mail, password, role_id } = user;
+
+  let birthdate: Date;
+  if (user.birthdate) {
+    birthdate = new Date(user.birthdate);
+  } else {
+    birthdate = new Date();
+  }
+
+  return db.user.update({
+    where: { id },
+    data: {
+      firstName,
+      lastName,
+      mail,
+      birthdate,
+      password,
+      role_id,
+    },
+  });
+}
