@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import { userRouter } from "./user/user.router";
+import { roleRouter } from "./role/role.router";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 const PORT = process.env.PORT;
 
 app.use("/users", userRouter);
+app.use("/role", roleRouter);
 // const connexion = mysql.createConnection({
 //   host: process.env.DB_HOST,
 //   user: process.env.DB_USER,
