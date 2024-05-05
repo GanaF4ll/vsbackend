@@ -5,7 +5,7 @@ import * as RoleController from "./role.controller";
 
 export const roleRouter = express.Router();
 
-roleRouter.get("/", async (req: Request, res: Response) => {
+roleRouter.get("/all", async (req: Request, res: Response) => {
   try {
     const roles = await RoleController.listRoles();
     return res.status(200).json(roles);
@@ -47,3 +47,32 @@ roleRouter.post(
     }
   }
 );
+
+roleRouter.put(
+  "/:id",
+  body("name").isString(),
+  async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ message: errors.array() });
+    }
+    const id: number = parseInt(req.params.id, 10);
+    try {
+      const role = req.body;
+      const updateRole = await RoleController.updateRole(role, id);
+      return res.status(200).json(updateRole);
+    } catch (error: any) {
+      return res.status(500).json(error.message);
+    }
+  }
+);
+
+roleRouter.delete("/:id", async (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id, 10);
+  try {
+    await RoleController.deleteRole(id);
+    return res.status(204).json("Role deleted");
+  } catch (error: any) {
+    return res.status(500).json(error.message);
+  }
+});
