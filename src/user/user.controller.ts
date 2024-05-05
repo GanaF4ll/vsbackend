@@ -4,26 +4,28 @@ type User = {
   id: number;
   firstName: string;
   lastName: string;
+  birthdate: Date;
   mail: string;
-  role: string;
-  birthdate?: Date;
-  password?: string;
+  password: string;
+  role_id: number;
 };
 
 export const listUsers = async (): Promise<User[]> => {
-  return db.users.findMany({
+  return db.user.findMany({
     select: {
       id: true,
       firstName: true,
       lastName: true,
+      birthdate: true,
       mail: true,
-      role: true,
+      password: true,
+      role_id: true,
     },
   });
 };
 
 export const getUserById = async (id: number): Promise<User | null> => {
-  return db.users.findUnique({
+  return db.user.findUnique({
     where: {
       id,
     },
@@ -37,58 +39,17 @@ export const createUser = async (user: Omit<User, "id">): Promise<User> => {
     mail,
     birthdate = new Date(),
     password,
-    role,
+    role_id,
   } = user;
 
-  // if (!password) {
-  //   throw new Error("Password is required");
-  // }
-
-  return db.users.create({
-    data: {
-      firstName: firstName,
-      lastName: lastName,
-      mail: mail,
-      birthdate: birthdate,
-      password: password || "", // Provide a default value of an empty string if password is undefined
-      role: role,
-    },
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      mail: true,
-      role: true,
-      birthdate: true,
-      password: true,
-    },
-  });
-};
-
-export const updateUser = async (
-  user: Omit<User, "id">,
-  id: number
-): Promise<User> => {
-  const { firstName, lastName, mail, birthdate, password, role } = user;
-  return db.users.update({
-    where: {
-      id,
-    },
+  return db.user.create({
     data: {
       firstName,
       lastName,
       mail,
-      birthdate: birthdate ?? "",
-      password: password || "",
-      role,
-    },
-  });
-};
-
-export const deleteUser = async (id: number): Promise<User | null> => {
-  return db.users.delete({
-    where: {
-      id,
+      birthdate,
+      password,
+      role_id,
     },
   });
 };

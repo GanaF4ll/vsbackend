@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT;
 
-app.use("/users", userRouter);
+app.use("/user", userRouter);
 // const connexion = mysql.createConnection({
 //   host: process.env.DB_HOST,
 //   user: process.env.DB_USER,
