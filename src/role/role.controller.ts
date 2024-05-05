@@ -29,5 +29,9 @@ export const createRole = async (role: Omit<Role, "id">): Promise<Role> => {
     data: {
       name,
     },
+    select: {
+      id: true,
+      name: true,
+    },
   });
 };

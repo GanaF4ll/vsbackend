@@ -29,14 +29,21 @@ roleRouter.get("/:id", async (req: Request, res: Response) => {
   }
 });
 
-roleRouter.post("/add", async (req: Request, res: Response) => {
-  try {
+roleRouter.post(
+  "/add",
+  body("name").isString(),
+  async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() });
     }
-  } catch (error) {
-    const err = error as Error;
-    return res.status(500).json({ message: err.message });
+    try {
+      const role = req.body;
+      const newRole = await RoleController.createRole(role);
+      return res.status(201).json(newRole);
+    } catch (error) {
+      const err = error as Error;
+      return res.status(500).json({ message: err.message });
+    }
   }
-});
+);

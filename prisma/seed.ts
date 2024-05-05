@@ -6,7 +6,7 @@ type User = {
   birthdate: Date;
   mail: string;
   password: string;
-  role: string;
+  role: number;
 };
 
 function getUsers(): Array<User> {
@@ -17,7 +17,7 @@ function getUsers(): Array<User> {
       birthdate: new Date("1990-01-01"),
       mail: "setokaiba@gmail.com",
       password: "blueeyeswhite123",
-      role: "user",
+      role: null,
     },
     {
       firstName: "Ichigo",
@@ -25,7 +25,7 @@ function getUsers(): Array<User> {
       birthdate: new Date("1990-01-01"),
       mail: "kurosaki@gmail.com",
       password: "bankai123",
-      role: "user",
+      role: null,
     },
   ];
 }
@@ -33,18 +33,22 @@ function getUsers(): Array<User> {
 async function seedUsers() {
   const users = getUsers();
   for (const user of users) {
-    await db.users.create({
+    await db.user.create({
       data: {
         firstName: user.firstName,
         lastName: user.lastName,
         birthdate: user.birthdate,
         mail: user.mail,
         password: user.password,
-        role: user.role,
+        role: {
+          connect: {
+            id: user.role,
+          },
+        },
       },
     });
   }
-  const author = await db.users.findFirst({
+  const author = await db.user.findFirst({
     where: {
       firstName: "Seto",
     },
