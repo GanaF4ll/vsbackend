@@ -1,13 +1,13 @@
 import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 
-import * as UserService from "./user.controller";
+import * as UserController from "./user.controller";
 
 export const userRouter = express.Router();
 
 userRouter.get("/", async (req: Request, res: Response) => {
   try {
-    const users = await UserService.listUsers();
+    const users = await UserController.listUsers();
     return res.status(200).json(users);
   } catch (error: any) {
     const err = error as Error;
@@ -18,7 +18,7 @@ userRouter.get("/", async (req: Request, res: Response) => {
 userRouter.get("/:id", async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
-    const user = await UserService.getUserById(id);
+    const user = await UserController.getUserById(id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -30,17 +30,26 @@ userRouter.get("/:id", async (req: Request, res: Response) => {
 });
 
 // Params: firstName, lastName, mail, birthdate, password, role
-userRouter.post("/", async (req: Request, res: Response) => {
-  try {
+userRouter.post(
+  "/add",
+  body("firstName").isString(),
+  body("lastName").isString(),
+  body("birthdate").isString(),
+  body("mail").isString(),
+  body("password").isString(),
+  body("role_id").isInt(),
+  async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ message: errors.array() });
     }
-
-    const user = await UserService.createUser(req.body);
-    return res.status(201).json(user);
-  } catch (error: any) {
-    const err = error as Error;
-    return res.status(500).json({ message: err.message });
+    try {
+      const user = req.body;
+      const newUser = await UserController.createUser(user);
+      return res.status(201).json(newUser);
+    } catch (error) {
+      const err = error as Error;
+      return res.status(500).json({ message: err.message });
+    }
   }
-});
+);

@@ -33,14 +33,14 @@ export const getUserById = async (id: number): Promise<User | null> => {
 };
 
 export const createUser = async (user: Omit<User, "id">): Promise<User> => {
-  const {
-    firstName,
-    lastName,
-    mail,
-    birthdate = new Date(),
-    password,
-    role_id,
-  } = user;
+  const { firstName, lastName, mail, password, role_id } = user;
+
+  let birthdate: Date;
+  if (user.birthdate) {
+    birthdate = new Date(user.birthdate);
+  } else {
+    birthdate = new Date();
+  }
 
   return db.user.create({
     data: {
