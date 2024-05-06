@@ -1,7 +1,8 @@
 import { db } from "../db/db.server";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { hashSync, compareSync } from "bcrypt";
+import * as jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { Request, Response } from "express";
 
 dotenv.config();
 
@@ -94,36 +95,18 @@ export const deleteUser = async (id: number): Promise<User> => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  try {
-    const user = await db.user.findFirst({
-      where: {
-        mail: req.body.mail,
-      },
-    });
-
-    if (
-      !user ||
-      !(await bcrypt.compare(req.body.password, admin.password as String))
-    ) {
-      res
-        .status(401)
-        .json({ message: "Incorrect combination of email and password" });
-      return;
-    }
-
-    const userData = {
-      id: user.id,
-      mail: user.mail,
-    };
-
-    const token = jwt.sign(adminData, process.env.TOKEN_SECRET as string, {
-      expiresIn: "48h",
-    });
-    res.status(200).json({ token });
-  } catch (error) {
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "An error occurred during the connection attempt" });
+  const { mail, password } = req.body;
+  let user = await db.user.findFirst({ where: { mail } });
+  if (!user) {
+    throw new Error("User not found");
   }
+  if (!compareSync(password, user.password)) {
+    throw new Error("Invalid combination of mail and password");
+  }
+  const token = jwt.sign(
+    { id: user.id, mail: user.mail },
+    process.env.TOKEN_SECRET as string
+  );
+
+  res.json({ token });
 };
