@@ -78,8 +78,11 @@ userRouter.put(
   }
 );
 
-userRouter.delete("/;id", async (req: Request, res: Response) => {
+userRouter.delete("/:id", async (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id);
   try {
+    await UserController.deleteUser(id);
+    res.status(204).json("User deleted");
   } catch (error: any) {
     return res.status(500).json(error.message);
   }
