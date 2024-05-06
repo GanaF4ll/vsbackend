@@ -1,4 +1,9 @@
 import { db } from "../db/db.server";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 type User = {
   id: number;
@@ -86,4 +91,39 @@ export const deleteUser = async (id: number): Promise<User> => {
       id,
     },
   });
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    const user = await db.user.findFirst({
+      where: {
+        mail: req.body.mail,
+      },
+    });
+
+    if (
+      !user ||
+      !(await bcrypt.compare(req.body.password, admin.password as String))
+    ) {
+      res
+        .status(401)
+        .json({ message: "Incorrect combination of email and password" });
+      return;
+    }
+
+    const userData = {
+      id: user.id,
+      mail: user.mail,
+    };
+
+    const token = jwt.sign(adminData, process.env.TOKEN_SECRET as string, {
+      expiresIn: "48h",
+    });
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred during the connection attempt" });
+  }
 };
