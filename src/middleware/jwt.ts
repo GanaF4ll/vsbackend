@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 import { Request, Response, NextFunction } from "express";
 
-export const authToken = (req: Request, res: Response, next: NextFunction) => {
+export const userToken = (req: Request, res: Response, next: NextFunction) => {
   console.log("Headers:", req.headers);
 
   let token = req.headers["authorization"] as string;
