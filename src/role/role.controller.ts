@@ -6,7 +6,7 @@ type Role = {
 };
 
 export const listRoles = async (): Promise<Role[]> => {
-  return db.role.findMany({
+  return db.roles.findMany({
     select: {
       id: true,
       name: true,
@@ -15,7 +15,7 @@ export const listRoles = async (): Promise<Role[]> => {
 };
 
 export const getRoleById = async (id: number): Promise<Role | null> => {
-  return db.role.findUnique({
+  return db.roles.findUnique({
     where: {
       id,
     },
@@ -25,7 +25,7 @@ export const getRoleById = async (id: number): Promise<Role | null> => {
 export const createRole = async (role: Omit<Role, "id">): Promise<Role> => {
   const { name } = role;
 
-  return db.role.create({
+  return db.roles.create({
     data: {
       name,
     },
@@ -41,7 +41,7 @@ export const updateRole = async (
   id: number
 ): Promise<Role> => {
   const { name } = role;
-  return db.role.update({
+  return db.roles.update({
     where: {
       id,
     },
@@ -52,7 +52,7 @@ export const updateRole = async (
 };
 
 export const deleteRole = async (id: number): Promise<Role | null> => {
-  return db.role.delete({
+  return db.roles.delete({
     where: {
       id,
     },

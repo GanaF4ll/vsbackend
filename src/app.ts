@@ -13,8 +13,8 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT;
 
-// app.use("/users", userRouter);
-app.use("/role", roleRouter);
+app.use("/users", userRouter);
+app.use("/roles", roleRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
