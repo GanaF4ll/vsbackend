@@ -40,27 +40,56 @@ export const getUserById = async (id: number): Promise<User | null> => {
   });
 };
 
-export const createUser = async (user: Omit<User, "id">): Promise<User> => {
-  const { firstName, lastName, mail, password, role_id, isPro } = user;
+// export const createUser = async (user: Omit<User, "id">): Promise<User> => {
+//   const { firstName, lastName, mail, password, role_id, isPro } = user;
+
+//   let birthdate: Date;
+//   if (user.birthdate) {
+//     birthdate = new Date(user.birthdate);
+//   } else {
+//     birthdate = new Date();
+//   }
+
+//   return db.users.create({
+//     data: {
+//       firstName,
+//       lastName,
+//       mail,
+//       birthdate,
+//       password,
+//       role_id,
+//       isPro,
+//     },
+//   });
+// };
+
+export const signup = async (req: Request, res: Response) => {
+  const { firstName, lastName, mail, password, role_id, isPro } = req.body;
+
+  let user = await db.users.findFirst({ where: { mail } });
+  if (user) {
+    res.status(400).json({ message: "ERROR: User already exists !" });
+  }
 
   let birthdate: Date;
-  if (user.birthdate) {
-    birthdate = new Date(user.birthdate);
+  if (req.body.birthdate) {
+    birthdate = new Date(req.body.birthdate);
   } else {
     birthdate = new Date();
   }
-
-  return db.users.create({
+  user = await db.users.create({
     data: {
       firstName,
       lastName,
       mail,
       birthdate,
-      password,
+      password: hashSync(password, 10),
       role_id,
       isPro,
     },
   });
+
+  res.status(201).json(user);
 };
 
 export async function updateUser(

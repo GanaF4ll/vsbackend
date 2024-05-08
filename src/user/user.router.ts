@@ -30,29 +30,31 @@ userRouter.get("/:id", async (req: Request, res: Response) => {
 });
 
 // Params: firstName, lastName, mail, birthdate, password, role
-userRouter.post(
-  "/add",
-  body("firstName").isString(),
-  body("lastName").isString(),
-  body("birthdate").isString(),
-  body("mail").isString(),
-  body("password").isString(),
-  body("role_id").isInt(),
-  async (req: Request, res: Response) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array() });
-    }
-    try {
-      const user = req.body;
-      const newUser = await UserController.createUser(user);
-      return res.status(201).json(newUser);
-    } catch (error) {
-      const err = error as Error;
-      return res.status(500).json({ message: err.message });
-    }
-  }
-);
+// userRouter.post(
+//   "/signup",
+//   body("firstName").isString(),
+//   body("lastName").isString(),
+//   body("birthdate").isString(),
+//   body("mail").isString(),
+//   body("password").isString(),
+//   body("role_id").isInt(),
+//   async (req: Request, res: Response) => {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({ message: errors.array() });
+//     }
+//     try {
+//       const user = req.body;
+//       const newUser = await UserController.createUser(user);
+//       return res.status(201).json(newUser);
+//     } catch (error) {
+//       const err = error as Error;
+//       return res.status(500).json({ message: err.message });
+//     }
+//   }
+// );
+
+userRouter.post("/signup", UserController.signup);
 
 userRouter.put(
   "/:id",
