@@ -6,16 +6,16 @@ import { Request, Response } from "express";
 
 dotenv.config();
 
-type User = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  birthdate: Date;
-  mail: string;
-  password: string;
-  role_id: number;
-  isPro: boolean;
-};
+// type User = {
+//   id: number;
+//   firstName: string;
+//   lastName: string;
+//   birthdate: Date;
+//   mail: string;
+//   password: string;
+//   role_id: number;
+//   isPro: boolean;
+// };
 
 export const listUsers = async (req: Request, res: Response) => {
   try {
@@ -80,50 +80,62 @@ export const signup = async (req: Request, res: Response) => {
   res.status(201).json(user);
 };
 
-export async function updateUser(
-  user: Omit<User, "id">,
-  id: number
-): Promise<User> {
-  const { firstName, lastName, mail, password, role_id, isPro } = user;
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { firstName, lastName, mail, password, role_id, isPro } = req.body;
+    await db.users.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        firstName,
+        lastName,
+        mail,
+        password: hashSync(password, 10),
+        role_id,
+        isPro,
+      },
+    });
 
-  let birthdate: Date;
-  if (user.birthdate) {
-    birthdate = new Date(user.birthdate);
-  } else {
-    birthdate = new Date();
+    const updatedUser = await db.users.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    res.status(200).json(updatedUser);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: "User not updated" });
   }
+};
 
-  return db.users.update({
-    where: { id },
-    data: {
-      firstName,
-      lastName,
-      mail,
-      birthdate,
-      password,
-      role_id,
-      isPro,
-    },
-  });
-}
-
-export const deleteUser = async (id: number): Promise<User> => {
-  return db.users.delete({
-    where: {
-      id,
-    },
-  });
+export const deleteUser = async (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id);
+  try {
+    const user = await db.users.delete({
+      where: {
+        id,
+      },
+    });
+    res.status(200).json({ message: "User deleted : ", user });
+  } catch (error: any) {
+    res.status(500).json({ message: "User not deleted" });
+  }
 };
 
 export const login = async (req: Request, res: Response) => {
   const { mail, password } = req.body;
   let user = await db.users.findFirst({ where: { mail } });
   if (!user) {
-    throw new Error("User not found");
+    return res.status(400).json({ message: "User not found" });
   }
-  if (!compareSync(password, user.password)) {
-    throw new Error("Invalid combination of mail and password");
-  }
+  // if (!compareSync(password, user.password)) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: "Invalid combination of mail and password" });
+  // }
   const token = jwt.sign(
     { id: user.id, mail: user.mail },
     process.env.TOKEN_SECRET as string
