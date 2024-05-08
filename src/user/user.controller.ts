@@ -14,10 +14,11 @@ type User = {
   mail: string;
   password: string;
   role_id: number;
+  isPro: boolean;
 };
 
 export const listUsers = async (): Promise<User[]> => {
-  return db.user.findMany({
+  return db.users.findMany({
     select: {
       id: true,
       firstName: true,
@@ -26,12 +27,13 @@ export const listUsers = async (): Promise<User[]> => {
       mail: true,
       password: true,
       role_id: true,
+      isPro: true,
     },
   });
 };
 
 export const getUserById = async (id: number): Promise<User | null> => {
-  return db.user.findUnique({
+  return db.users.findUnique({
     where: {
       id,
     },
@@ -39,7 +41,7 @@ export const getUserById = async (id: number): Promise<User | null> => {
 };
 
 export const createUser = async (user: Omit<User, "id">): Promise<User> => {
-  const { firstName, lastName, mail, password, role_id } = user;
+  const { firstName, lastName, mail, password, role_id, isPro } = user;
 
   let birthdate: Date;
   if (user.birthdate) {
@@ -48,7 +50,7 @@ export const createUser = async (user: Omit<User, "id">): Promise<User> => {
     birthdate = new Date();
   }
 
-  return db.user.create({
+  return db.users.create({
     data: {
       firstName,
       lastName,
@@ -56,6 +58,7 @@ export const createUser = async (user: Omit<User, "id">): Promise<User> => {
       birthdate,
       password,
       role_id,
+      isPro,
     },
   });
 };
@@ -64,7 +67,7 @@ export async function updateUser(
   user: Omit<User, "id">,
   id: number
 ): Promise<User> {
-  const { firstName, lastName, mail, password, role_id } = user;
+  const { firstName, lastName, mail, password, role_id, isPro } = user;
 
   let birthdate: Date;
   if (user.birthdate) {
@@ -73,7 +76,7 @@ export async function updateUser(
     birthdate = new Date();
   }
 
-  return db.user.update({
+  return db.users.update({
     where: { id },
     data: {
       firstName,
@@ -82,12 +85,13 @@ export async function updateUser(
       birthdate,
       password,
       role_id,
+      isPro,
     },
   });
 }
 
 export const deleteUser = async (id: number): Promise<User> => {
-  return db.user.delete({
+  return db.users.delete({
     where: {
       id,
     },
@@ -96,7 +100,7 @@ export const deleteUser = async (id: number): Promise<User> => {
 
 export const login = async (req: Request, res: Response) => {
   const { mail, password } = req.body;
-  let user = await db.user.findFirst({ where: { mail } });
+  let user = await db.users.findFirst({ where: { mail } });
   if (!user) {
     throw new Error("User not found");
   }
