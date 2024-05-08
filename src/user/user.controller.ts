@@ -17,51 +17,39 @@ type User = {
   isPro: boolean;
 };
 
-export const listUsers = async (): Promise<User[]> => {
-  return db.users.findMany({
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      birthdate: true,
-      mail: true,
-      password: true,
-      role_id: true,
-      isPro: true,
-    },
-  });
+export const listUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await db.users.findMany({
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        birthdate: true,
+        mail: true,
+        role_id: true,
+        isPro: true,
+      },
+    });
+    res.status(200).json(users);
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json({ message: "No user found" });
+  }
 };
 
-export const getUserById = async (id: number): Promise<User | null> => {
-  return db.users.findUnique({
-    where: {
-      id,
-    },
-  });
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const user = await db.users.findUnique({
+      where: {
+        id: parseInt(req.params.id),
+      },
+    });
+    res.status(200).json(user);
+  } catch (error: any) {
+    console.error(error);
+    res.status(404).json({ message: "No user found with that id" });
+  }
 };
-
-// export const createUser = async (user: Omit<User, "id">): Promise<User> => {
-//   const { firstName, lastName, mail, password, role_id, isPro } = user;
-
-//   let birthdate: Date;
-//   if (user.birthdate) {
-//     birthdate = new Date(user.birthdate);
-//   } else {
-//     birthdate = new Date();
-//   }
-
-//   return db.users.create({
-//     data: {
-//       firstName,
-//       lastName,
-//       mail,
-//       birthdate,
-//       password,
-//       role_id,
-//       isPro,
-//     },
-//   });
-// };
 
 export const signup = async (req: Request, res: Response) => {
   const { firstName, lastName, mail, password, role_id, isPro } = req.body;
