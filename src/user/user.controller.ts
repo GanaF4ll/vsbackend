@@ -6,17 +6,6 @@ import { Request, Response } from "express";
 
 dotenv.config();
 
-// type User = {
-//   id: number;
-//   firstName: string;
-//   lastName: string;
-//   birthdate: Date;
-//   mail: string;
-//   password: string;
-//   role_id: number;
-//   isPro: boolean;
-// };
-
 export const listUsers = async (req: Request, res: Response) => {
   try {
     const users = await db.users.findMany({
@@ -81,12 +70,12 @@ export const signup = async (req: Request, res: Response) => {
 };
 
 export const updateUser = async (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id);
   try {
-    const { id } = req.params;
     const { firstName, lastName, mail, password, role_id, isPro } = req.body;
     await db.users.update({
       where: {
-        id: parseInt(id),
+        id,
       },
       data: {
         firstName,
@@ -100,7 +89,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
     const updatedUser = await db.users.findUnique({
       where: {
-        id: parseInt(id),
+        id,
       },
     });
 
@@ -121,7 +110,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     });
     res.status(200).json({ message: "User deleted : ", user });
   } catch (error: any) {
-    res.status(500).json({ message: "User not deleted" });
+    res.status(500).json({ message: "User could not be deleted" });
   }
 };
 
