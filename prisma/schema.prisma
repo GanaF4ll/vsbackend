@@ -7,106 +7,107 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Answer {
+model Answers {
   id          Int      @id @default(autoincrement())
   question_id Int
-  question    Question @relation(fields: [question_id], references: [id])
+  question    Questions @relation(fields: [question_id], references: [id])
   content     String   @db.Text
   valid       Boolean
 }
 
-model Article {
+model Articles {
   id          Int      @id @default(autoincrement())
   author_id   Int
-  author      User     @relation("ArticleAuthor", fields: [author_id], references: [id])
+  author      Users     @relation("ArticleAuthor", fields: [author_id], references: [id])
   title       String   @db.Text
   content     String   @db.Text
   category_id Int
-  category    Category @relation(fields: [category_id], references: [id])
+  category    Categories @relation(fields: [category_id], references: [id])
   coverImage  String   @db.VarChar(50)
   createdAt   DateTime @default(now())
   modifiedAt  DateTime @default(now())
 }
 
-model Category {
+model Categories {
   id        Int       @id @default(autoincrement())
   name      String    @db.VarChar(20)
-  formations Formation[]
-  articles  Article[]
+  formations Formations[]
+  articles  Articles[]
 }
 
-model Chapter {
+model Chapters {
   id             Int        @id @default(autoincrement())
   formation_id   Int
-  formation      Formation  @relation(fields: [formation_id], references: [id])
+  formation      Formations  @relation(fields: [formation_id], references: [id])
   title          String     @db.VarChar(50)
   content        String     @db.Text
   chapter_number Int
-  progression    Progression[]
-  questions      Question[]
+  progression    Progressions[]
+  questions      Questions[]
 }
 
-model Formation {
+model Formations {
   id             Int         @id @default(autoincrement())
   author_id      Int
-  author         User        @relation("FormationAuthor", fields: [author_id], references: [id])
+  author         Users        @relation("FormationAuthor", fields: [author_id], references: [id])
   title          String      @db.VarChar(50)
   description    String      @db.Text
   video          String      @db.VarChar(50)
   category_id    Int
-  category       Category    @relation(fields: [category_id], references: [id])
+  category       Categories    @relation(fields: [category_id], references: [id])
   difficulty     String      @db.VarChar(10)
   completionTime DateTime    @db.Date
   qualityRating  Int
   coverImage     String      @db.VarChar(50)
-  chapters       Chapter[]
-  ratings        Rating[]
+  chapters       Chapters[]
+  ratings        Ratings[]
   createdAt      DateTime    @default(now())
   modifiedAt     DateTime    @default(now())
 }
 
-model Progression {
+model Progressions {
   user_id     Int     @id
-  user        User    @relation(fields: [user_id], references: [id])
+  user        Users    @relation(fields: [user_id], references: [id])
   progression Int
   grade       Int
   chapter_id  Int
-  chapter     Chapter @relation(fields: [chapter_id], references: [id])
+  chapter     Chapters @relation(fields: [chapter_id], references: [id])
 }
 
-model Question {
+model Questions {
   id         Int      @id
   question   String   @db.Text
   chapter_id Int
-  chapter    Chapter  @relation(fields: [chapter_id], references: [id])
-  answers    Answer[]
+  chapter    Chapters  @relation(fields: [chapter_id], references: [id])
+  answers    Answers[]
 }
 
-model Rating {
+model Ratings {
   id           Int        @id @default(autoincrement())
   formation_id Int
-  formation    Formation  @relation(fields: [formation_id], references: [id])
+  formation    Formations  @relation(fields: [formation_id], references: [id])
   grade        Int
 }
 
-model Role {
+model Roles {
   id    Int    @id @default(autoincrement())
   name  String @db.VarChar(50)
-  users User[]
+  users Users[]
 }
 
-model User {
+model Users {
   id         Int        @id @default(autoincrement())
   firstName  String     @db.VarChar(50)
   lastName   String     @db.VarChar(50)
   birthdate  DateTime   @db.Date
   mail       String     @db.VarChar(50)
   password   String     @db.VarChar(50)
-  role_id    Int
-  role       Role       @relation(fields: [role_id], references: [id])
-  articles   Article[]  @relation("ArticleAuthor")
-  formations Formation[] @relation("FormationAuthor")
-  progressions Progression[]
+  role_id    Int        @default(2)
+  isPro      Boolean    @default(false)
+  role       Roles       @relation(fields: [role_id], references: [id])
+  articles   Articles[]  @relation("ArticleAuthor")
+  formations Formations[] @relation("FormationAuthor")
+  progressions Progressions[]
   createdAt  DateTime   @default(now())
   modifiedAt DateTime?  @default(now())
 }

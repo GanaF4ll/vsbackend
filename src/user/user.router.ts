@@ -1,46 +1,18 @@
 import express, { Request, Response } from "express";
-import { body, validationResult } from "express-validator";
-
-import * as UserService from "./user.controller";
+import * as UserController from "./user.controller";
+import { userToken } from "../middleware/jwt";
 
 export const userRouter = express.Router();
 
-userRouter.get("/", async (req: Request, res: Response) => {
-  try {
-    const users = await UserService.listUsers();
-    return res.status(200).json(users);
-  } catch (error: any) {
-    const err = error as Error;
-    return res.status(500).json({ message: err.message });
-  }
-});
+userRouter.get("/", UserController.listUsers);
 
-userRouter.get("/:id", async (req: Request, res: Response) => {
-  try {
-    const id = parseInt(req.params.id);
-    const user = await UserService.getUserById(id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    return res.status(200).json(user);
-  } catch (error: any) {
-    const err = error as Error;
-    return res.status(500).json({ message: err.message });
-  }
-});
+userRouter.get("/:id", UserController.getUserById);
 
-// Params: firstName, lastName, mail, birthdate, password, role
-userRouter.post("/", async (req: Request, res: Response) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ message: errors.array() });
-    }
+// Params: firstName, lastName, mail, birthdate, password, role_id, isPro
+userRouter.post("/signup", UserController.signup);
 
-    const user = await UserService.createUser(req.body);
-    return res.status(201).json(user);
-  } catch (error: any) {
-    const err = error as Error;
-    return res.status(500).json({ message: err.message });
-  }
-});
+userRouter.put("/:id", userToken, UserController.updateUser);
+
+userRouter.delete("/:id", UserController.deleteUser);
+
+userRouter.post("/login", UserController.login);
