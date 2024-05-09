@@ -39,6 +39,21 @@ export const getFormationById = async (req: Request, res: Response) => {
   }
 };
 
+export const getFormationByCategory = async (req: Request, res: Response) => {
+  const category_id = parseInt(req.params.category_id);
+  try {
+    const formations = await db.formations.findMany({
+      where: { category_id },
+    });
+    res.status(200).json(formations);
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "No formations found with this category_id" });
+  }
+};
+
 export const createFormation = async (req: Request, res: Response) => {
   try {
     const {
@@ -61,15 +76,15 @@ export const createFormation = async (req: Request, res: Response) => {
 
     let formation = await db.formations.create({
       data: {
-        author_id,
         title,
         description,
         video,
-        category_id,
         difficulty,
         completionTime,
         qualityRating,
         coverImage,
+        author: { connect: { id: author_id } },
+        category: { connect: { id: category_id } },
       },
     });
     res.status(201).json(formation);
@@ -103,15 +118,15 @@ export const updateFormation = async (req: Request, res: Response) => {
     await db.formations.update({
       where: { id },
       data: {
-        author_id,
         title,
         description,
         video,
-        category_id,
         difficulty,
         completionTime,
         qualityRating,
         coverImage,
+        author: { connect: { id: author_id } },
+        category: { connect: { id: category_id } },
       },
     });
 
