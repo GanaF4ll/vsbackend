@@ -33,7 +33,7 @@ export const listUsers = async (req: Request, res: Response) => {
     res.status(200).json(users);
   } catch (error: any) {
     console.log(error);
-    res.status(500).json({ message: "No user found" });
+    res.status(500).json({ message: "No users found" });
   }
 };
 

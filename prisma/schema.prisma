@@ -31,8 +31,8 @@ model Articles {
 model Categories {
   id        Int       @id @default(autoincrement())
   name      String    @db.VarChar(50)
-  formations Formation[]
-  articles  Article[]
+  formations Formations[]
+  articles  Articles[]
 }
 
 model Chapters {

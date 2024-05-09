@@ -1,62 +1,92 @@
 import { db } from "../db/db.server";
+import { Request, Response } from "express";
 
-type Category = {
-  id: number;
-  name: string;
+export const listCategories = async (req: Request, res: Response) => {
+  try {
+    const categories = await db.categories.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    res.status(200).json(categories);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "No categories found" });
+  }
 };
 
-export const listCategories = async (): Promise<Category[]> => {
-  return db.category.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+export const getCategoryById = async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  try {
+    const category = await db.categories.findUnique({
+      where: {
+        id,
+      },
+    });
+    res.status(200).json(category);
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json({ message: "No categories found with this ID" });
+  }
 };
 
-export const getCategoryById = async (id: number): Promise<Category | null> => {
-  return db.category.findUnique({
-    where: {
-      id,
-    },
-  });
+export const createCategory = async (req: Request, res: Response) => {
+  try {
+    const { name } = req.body;
+    let category = await db.categories.findFirst({ where: { name } });
+
+    category = await db.categories.create({
+      data: {
+        name,
+      },
+    });
+    res.status(201).json(category);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: "Category not created" });
+  }
 };
 
-export const createCategory = async (
-  category: Omit<Category, "id">
-): Promise<Category> => {
-  const { name } = category;
+export const updateCategory = async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  try {
+    const { name } = req.body;
+    await db.categories.update({
+      where: {
+        id,
+      },
+      data: {
+        name,
+      },
+    });
 
-  return db.category.create({
-    data: {
-      name,
-    },
-    select: {
-      id: true,
-      name: true,
-    },
-  });
+    const updatedCategory = await db.categories.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    res.status(200).json(updateCategory);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: "Category not updated" });
+  }
 };
 
-export const updateCategory = async (
-  category: Omit<Category, "id">,
-  id: number
-): Promise<Category> => {
-  const { name } = category;
-  return db.category.update({
-    where: {
-      id,
-    },
-    data: {
-      name,
-    },
-  });
-};
-
-export const deleteCategory = async (id: number): Promise<Category | null> => {
-  return db.category.delete({
-    where: {
-      id,
-    },
-  });
+export const deleteCategory = async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  try {
+    const category = await db.categories.delete({
+      where: { id },
+    });
+    res.status(200).json({ message: "Category deleted: ", category });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: "Could not delete the category" });
+  }
 };
