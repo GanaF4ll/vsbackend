@@ -1,5 +1,5 @@
 import { db } from "../db/db.server";
-import { Request, response } from "express";
+import { Request, Response } from "express";
 
 export const listChapters = async (req: Request, res: Response) => {
   try {

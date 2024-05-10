@@ -6,6 +6,7 @@ import { userRouter } from "./user/user.router";
 import { roleRouter } from "./role/role.router";
 import { categoryRouter } from "./category/category.router";
 import { formationRouter } from "./formation/formation.router";
+import { chapterRouter } from "./chapter/chapter.router";
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use("/users", userRouter);
 app.use("/roles", roleRouter);
 app.use("/categories", categoryRouter);
 app.use("/formations", formationRouter);
+app.use("/chapters", chapterRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
