@@ -50,7 +50,7 @@ export const createChapter = async (req: Request, res: Response) => {
   try {
     let chapter = await db.chapters.create({
       data: {
-        formation_id,
+        formation: { connect: { id: formation_id } },
         title,
         content,
         chapter_number,
@@ -71,7 +71,7 @@ export const updateChapter = async (req: Request, res: Response) => {
     await db.chapters.update({
       where: { id },
       data: {
-        formation_id,
+        formation: { connect: { id: formation_id } },
         title,
         content,
         chapter_number,

@@ -12,7 +12,7 @@ chapterRouter.get(
   ChapterController.getChapterByFormation
 );
 
-chapterRouter.post("/", ChapterController.createChapter);
+chapterRouter.post("/add", ChapterController.createChapter);
 
 chapterRouter.put("/:id", ChapterController.updateChapter);
 
