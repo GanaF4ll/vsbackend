@@ -75,8 +75,8 @@ model Progressions {
 }
 
 model Questions {
-  id         Int      @id
-  question   String   @db.Text
+  id         Int      @id @default(autoincrement())
+  content   String   @db.Text
   chapter_id Int
   chapter    Chapters  @relation(fields: [chapter_id], references: [id])
   answers    Answers[]
