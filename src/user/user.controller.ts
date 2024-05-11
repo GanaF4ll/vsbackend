@@ -131,13 +131,9 @@ export const login = async (req: Request, res: Response) => {
   if (!user) {
     return res.status(400).json({ message: "User not found" });
   }
-  // if (!compareSync(password, user.password)) {
-  //   return res
-  //     .status(400)
-  //     .json({ message: "Invalid combination of mail and password" });
-  // }
+
   const token = jwt.sign(
-    { id: user.id, mail: user.mail },
+    { id: user.id, mail: user.mail, role: user.role_id },
     process.env.TOKEN_SECRET as string,
     { noTimestamp: true }
   );
