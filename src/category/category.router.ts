@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import { body, validationResult } from "express-validator";
 
 import * as CategoryController from "./category.controller";

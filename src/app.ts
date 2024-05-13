@@ -5,6 +5,10 @@ import cors from "cors";
 import { userRouter } from "./user/user.router";
 import { roleRouter } from "./role/role.router";
 import { categoryRouter } from "./category/category.router";
+import { formationRouter } from "./formation/formation.router";
+import { chapterRouter } from "./chapter/chapter.router";
+import { questionRouter } from "./question/question.router";
+import { answerRouter } from "./answer/answer.router";
 
 dotenv.config();
 
@@ -17,6 +21,10 @@ const PORT = process.env.PORT;
 app.use("/users", userRouter);
 app.use("/roles", roleRouter);
 app.use("/categories", categoryRouter);
+app.use("/formations", formationRouter);
+app.use("/chapters", chapterRouter);
+app.use("/questions", questionRouter);
+app.use("/answers", answerRouter);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
