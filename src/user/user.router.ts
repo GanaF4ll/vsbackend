@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import * as UserController from "./user.controller";
-import { userToken } from "../middleware/jwt";
+import { userToken, adminToken } from "../middleware/jwt";
 
 export const userRouter = express.Router();
 
@@ -18,3 +18,7 @@ userRouter.delete("/:id", UserController.deleteUser);
 userRouter.post("/login", UserController.login);
 
 userRouter.put("/pro/:id", userToken, UserController.sentinelUnlock);
+
+// ADMIN ROUTES
+
+userRouter.put("/admin/:id", adminToken, UserController.updateUser);
