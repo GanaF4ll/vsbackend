@@ -6,17 +6,6 @@ import { Request, Response } from "express";
 
 dotenv.config();
 
-// type User = {
-//   id: number;
-//   firstName: string;
-//   lastName: string;
-//   birthdate: Date;
-//   mail: string;
-//   password: string;
-//   role_id: number;
-//   isPro: boolean;
-// };
-
 export const listUsers = async (req: Request, res: Response) => {
   try {
     const users = await db.users.findMany({
@@ -59,6 +48,14 @@ export const signup = async (req: Request, res: Response) => {
     res.status(400).json({ message: "ERROR: User already exists !" });
   }
 
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+  if (!passwordRegex.test(password)) {
+    return res
+      .status(400)
+      .json({ message: "ERROR: Password is not strong enough!" });
+  }
+
   let birthdate: Date;
   if (req.body.birthdate) {
     birthdate = new Date(req.body.birthdate);
@@ -84,6 +81,22 @@ export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { firstName, lastName, mail, password, role_id, gender } = req.body;
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+    if (!passwordRegex.test(password)) {
+      return res
+        .status(400)
+        .json({ message: "ERROR: Password is not strong enough!" });
+    }
+
+    let birthdate: Date;
+    if (req.body.birthdate) {
+      birthdate = new Date(req.body.birthdate);
+    } else {
+      birthdate = new Date();
+    }
+
     await db.users.update({
       where: {
         id: parseInt(id),
