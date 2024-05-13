@@ -27,7 +27,7 @@ export const listUsers = async (req: Request, res: Response) => {
         birthdate: true,
         mail: true,
         role_id: true,
-        isPro: true,
+        gender: true,
       },
     });
     res.status(200).json(users);
@@ -52,7 +52,7 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const signup = async (req: Request, res: Response) => {
-  const { firstName, lastName, mail, password, role_id, isPro } = req.body;
+  const { firstName, lastName, mail, password, role_id, gender } = req.body;
 
   let user = await db.users.findFirst({ where: { mail } });
   if (user) {
@@ -73,7 +73,7 @@ export const signup = async (req: Request, res: Response) => {
       birthdate,
       password: hashSync(password, 10),
       role_id,
-      isPro,
+      gender,
     },
   });
 
@@ -83,7 +83,7 @@ export const signup = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { firstName, lastName, mail, password, role_id, isPro } = req.body;
+    const { firstName, lastName, mail, password, role_id, gender } = req.body;
     await db.users.update({
       where: {
         id: parseInt(id),
@@ -94,7 +94,7 @@ export const updateUser = async (req: Request, res: Response) => {
         mail,
         password: hashSync(password, 10),
         role_id,
-        isPro,
+        gender,
       },
     });
 
