@@ -153,3 +153,21 @@ export const login = async (req: Request, res: Response) => {
 
   res.status(200).json({ token });
 };
+
+export const sentinelUnlock = async (req: Request, res: Response) => {
+  const role_id = 5;
+  const id = parseInt(req.params.id);
+  let user = await db.users.findFirst({ where: { role_id } });
+  try {
+    await db.users.update({
+      where: { id },
+      data: {
+        role_id,
+      },
+    });
+    const updatedUser = await db.users.findUnique({ where: { id } });
+    res
+      .status(200)
+      .json({ message: `User ${id} is now a SENTINEL:`, updatedUser });
+  } catch (error) {}
+};

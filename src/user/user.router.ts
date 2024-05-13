@@ -16,3 +16,5 @@ userRouter.put("/:id", userToken, UserController.updateUser);
 userRouter.delete("/:id", UserController.deleteUser);
 
 userRouter.post("/login", UserController.login);
+
+userRouter.put("/pro/:id", userToken, UserController.sentinelUnlock);
