@@ -1,5 +1,6 @@
 import * as QuestionController from "./question.controller";
 import { Router } from "express";
+import { creatorToken } from "../middleware/jwt";
 
 export const questionRouter = Router();
 
@@ -12,8 +13,8 @@ questionRouter.get(
   QuestionController.getQuestionByChapter
 );
 
-questionRouter.post("/add", QuestionController.createQuestion);
+questionRouter.post("/add", creatorToken, QuestionController.createQuestion);
 
-questionRouter.put("/:id", QuestionController.updateQuestion);
+questionRouter.put("/:id", creatorToken, QuestionController.updateQuestion);
 
-questionRouter.delete("/:id", QuestionController.deleteQuestion);
+questionRouter.delete("/:id", creatorToken, QuestionController.deleteQuestion);

@@ -1,5 +1,6 @@
 import express from "express";
 import { body, validationResult } from "express-validator";
+import { creatorToken } from "../middleware/jwt";
 
 import * as CategoryController from "./category.controller";
 
@@ -9,8 +10,8 @@ categoryRouter.get("/all", CategoryController.listCategories);
 
 categoryRouter.get("/:id", CategoryController.getCategoryById);
 
-categoryRouter.post("/add", CategoryController.createCategory);
+categoryRouter.post("/add", creatorToken, CategoryController.createCategory);
 
-categoryRouter.put("/:id", CategoryController.updateCategory);
+categoryRouter.put("/:id", creatorToken, CategoryController.updateCategory);
 
-categoryRouter.delete("/:id", CategoryController.deleteCategory);
+categoryRouter.delete("/:id", creatorToken, CategoryController.deleteCategory);

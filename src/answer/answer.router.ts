@@ -1,5 +1,6 @@
 import * as AnswerController from "./answer.controller";
 import { Router } from "express";
+import { creatorToken } from "../middleware/jwt";
 
 export const answerRouter = Router();
 
@@ -15,8 +16,8 @@ answerRouter.get(
   AnswerController.getValidAnswersByQuestion
 );
 
-answerRouter.post("/add", AnswerController.createAnswer);
+answerRouter.post("/add", creatorToken, AnswerController.createAnswer);
 
-answerRouter.put("/:id", AnswerController.updateAnswer);
+answerRouter.put("/:id", creatorToken, AnswerController.updateAnswer);
 
-answerRouter.delete("/:id", AnswerController.deleteAnswer);
+answerRouter.delete("/:id", creatorToken, AnswerController.deleteAnswer);

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as ChapterController from "./chapter.controller";
+import { creatorToken } from "../middleware/jwt";
 
 export const chapterRouter = Router();
 
@@ -12,8 +13,8 @@ chapterRouter.get(
   ChapterController.getChapterByFormation
 );
 
-chapterRouter.post("/add", ChapterController.createChapter);
+chapterRouter.post("/add", creatorToken, ChapterController.createChapter);
 
-chapterRouter.put("/:id", ChapterController.updateChapter);
+chapterRouter.put("/:id", creatorToken, ChapterController.updateChapter);
 
-chapterRouter.delete("/:id", ChapterController.deleteChapter);
+chapterRouter.delete("/:id", creatorToken, ChapterController.deleteChapter);

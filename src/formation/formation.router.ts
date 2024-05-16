@@ -1,5 +1,6 @@
 import express from "express";
 import * as FormationController from "./formation.controller";
+import { creatorToken } from "../middleware/jwt";
 
 export const formationRouter = express.Router();
 
@@ -12,8 +13,12 @@ formationRouter.get(
   FormationController.getFormationByCategory
 );
 
-formationRouter.post("/add", FormationController.createFormation);
+formationRouter.post("/add", creatorToken, FormationController.createFormation);
 
-formationRouter.put("/:id", FormationController.updateFormation);
+formationRouter.put("/:id", creatorToken, FormationController.updateFormation);
 
-formationRouter.delete("/:id", FormationController.deleteFormation);
+formationRouter.delete(
+  "/:id",
+  creatorToken,
+  FormationController.deleteFormation
+);

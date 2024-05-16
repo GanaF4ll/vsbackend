@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
+import { adminToken } from "../middleware/jwt";
 
 import * as RoleController from "./role.controller";
 
