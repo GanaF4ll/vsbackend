@@ -28,8 +28,15 @@ export const getFormationById = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
     const formation = await db.formations.findUnique({
-      where: {
-        id,
+      where: { id },
+      include: {
+        chapters: {
+          include: {
+            questions: {
+              include: { answers: true },
+            },
+          },
+        },
       },
     });
     res.status(200).json({ formation });
