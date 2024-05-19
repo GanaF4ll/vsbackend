@@ -49,10 +49,10 @@ export const getFormationByIdDev = async (req: Request, res: Response) => {
 
 // returns the data needed for the front-end
 export const getFormationById = async (req: Request, res: Response) => {
-  const id = parseInt(req.params.id);
+  const formationId = parseInt(req.params.id);
   try {
     const formation = await db.formations.findUnique({
-      where: { id },
+      where: { id: formationId },
       include: {
         author: {
           select: {
@@ -75,12 +75,57 @@ export const getFormationById = async (req: Request, res: Response) => {
       },
     });
 
-    res.status(200).json({
-      formation,
-      authorName: formation
-        ? `${formation.author.firstName} ${formation.author.lastName}`
-        : null,
-    });
+    if (!formation) {
+      return res.status(404).json({ message: "Formation not found" });
+    }
+
+    const {
+      id,
+      title,
+      description,
+      video,
+      difficulty,
+      completionTime,
+      qualityRating,
+      coverImage,
+      author: { firstName, lastName },
+      category: { name: categoryName },
+      chapters,
+    } = formation;
+
+    const simplifiedFormation = {
+      id,
+      title,
+      description,
+      video,
+      difficulty,
+      completionTime,
+      qualityRating,
+      coverImage,
+      author: `${firstName} ${lastName}`,
+      category: categoryName,
+      chapters: chapters.map(
+        (chapter: { id: number; title: string; questions: any[] }) => ({
+          id: chapter.id,
+          title: chapter.title,
+          questions: chapter.questions.map(
+            (question: { id: number; content: string; answers: any[] }) => ({
+              id: question.id,
+              content: question.content,
+              answers: question.answers.map(
+                (answer: { id: number; content: string; valid: boolean }) => ({
+                  id: answer.id,
+                  content: answer.content,
+                  valid: answer.valid,
+                })
+              ),
+            })
+          ),
+        })
+      ),
+    };
+
+    res.status(200).json(simplifiedFormation);
   } catch (error: any) {
     console.error(error);
     res.status(500).json({ message: "No formations found with that ID" });
