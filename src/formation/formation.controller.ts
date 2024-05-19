@@ -24,7 +24,8 @@ export const listFormations = async (req: Request, res: Response) => {
   }
 };
 
-export const getFormationById = async (req: Request, res: Response) => {
+// returns all the data
+export const getFormationByIdDev = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
     const formation = await db.formations.findUnique({
@@ -46,6 +47,39 @@ export const getFormationById = async (req: Request, res: Response) => {
   }
 };
 
+// returns the data needed for the front-end
+export const getFormationById = async (req: Request, res: Response) => {
+  const id = parseInt(req.params.id);
+  try {
+    const formation = await db.formations.findUnique({
+      where: { id },
+      include: {
+        chapters: {
+          include: {
+            questions: {
+              include: { answers: true },
+            },
+          },
+        },
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({
+      formation,
+      // authorName: formation?.author?.firstName,
+      // lastName: formation?.author?.lastName,
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: "No formations found with that ID" });
+  }
+};
 export const getFormationByCategory = async (req: Request, res: Response) => {
   const category_id = parseInt(req.params.category_id);
   try {

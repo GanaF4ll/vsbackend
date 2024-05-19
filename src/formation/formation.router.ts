@@ -6,6 +6,8 @@ export const formationRouter = express.Router();
 
 formationRouter.get("/all", FormationController.listFormations);
 
+formationRouter.get("/dev/:id", FormationController.getFormationByIdDev);
+
 formationRouter.get("/:id", FormationController.getFormationById);
 
 formationRouter.get(
