@@ -54,6 +54,17 @@ export const getFormationById = async (req: Request, res: Response) => {
     const formation = await db.formations.findUnique({
       where: { id },
       include: {
+        author: {
+          select: {
+            firstName: true,
+            lastName: true,
+          },
+        },
+        category: {
+          select: {
+            name: true,
+          },
+        },
         chapters: {
           include: {
             questions: {
@@ -61,25 +72,21 @@ export const getFormationById = async (req: Request, res: Response) => {
             },
           },
         },
-        author: {
-          select: {
-            firstName: true,
-            lastName: true,
-          },
-        },
       },
     });
 
     res.status(200).json({
       formation,
-      // authorName: formation?.author?.firstName,
-      // lastName: formation?.author?.lastName,
+      authorName: formation
+        ? `${formation.author.firstName} ${formation.author.lastName}`
+        : null,
     });
   } catch (error: any) {
     console.error(error);
     res.status(500).json({ message: "No formations found with that ID" });
   }
 };
+
 export const getFormationByCategory = async (req: Request, res: Response) => {
   const category_id = parseInt(req.params.category_id);
   try {
