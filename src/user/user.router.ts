@@ -4,7 +4,7 @@ import { userToken, adminToken } from "../middleware/jwt";
 
 export const userRouter = express.Router();
 
-userRouter.get("/", UserController.listUsers);
+userRouter.get("/all", UserController.listUsers);
 
 userRouter.get("/:id", UserController.getUserById);
 
