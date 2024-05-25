@@ -34,7 +34,10 @@ const PORT = process.env.PORT;
 app.use(cors());
 
 app.use((req: Request, res: Response, next: NextFunction) => {
-  const allowedOrigins = [process.env.FRONTEND_DEV_URL, process.env.PROD];
+  const allowedOrigins = [
+    process.env.FRONTEND_DEV_URL,
+    // process.env.PROD
+  ];
   const origin = req.headers.origin as string;
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
