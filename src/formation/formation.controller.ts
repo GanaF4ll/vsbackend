@@ -1,4 +1,4 @@
-import { db } from "../db/db.server";
+import { db } from "../app";
 import { Request, Response } from "express";
 
 export const listFormations = async (req: Request, res: Response) => {

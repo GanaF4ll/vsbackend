@@ -1,4 +1,4 @@
-import { db } from "../db/db.server";
+import { db } from "../app";
 import { hashSync, compareSync } from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import dotenv from "dotenv";

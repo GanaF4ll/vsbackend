@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
+import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import cors from "cors";
 
@@ -13,6 +14,18 @@ import { answerRouter } from "./answer/answer.router";
 dotenv.config();
 
 const app = express();
+let db: PrismaClient;
+
+declare global {
+  var __db: PrismaClient | undefined;
+}
+
+if (!global.__db) {
+  global.__db = new PrismaClient();
+}
+db = global.__db;
+
+export { db };
 
 app.use(cors());
 app.use(express.json());

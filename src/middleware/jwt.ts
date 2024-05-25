@@ -1,4 +1,4 @@
-import { db } from "../db/db.server";
+import { db } from "../app";
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 import { Request, Response, NextFunction } from "express";
