@@ -6,13 +6,17 @@ import * as RoleController from "./role.controller";
 
 export const roleRouter = express.Router();
 
-roleRouter.get("/all", adminToken, RoleController.listRoles);
+roleRouter.get(
+  "/all",
+  // adminToken,
+  RoleController.listRoles
+);
 
 roleRouter.get("/:id", adminToken, RoleController.getRoleById);
 
 roleRouter.post(
-  "/",
-  adminToken,
+  "/add",
+  // adminToken,
   body("name").isString().notEmpty(),
   RoleController.createRole
 );

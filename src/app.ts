@@ -67,18 +67,18 @@ const connexion = mysql.createConnection({
   database: process.env.DB_NAME,
 });
 
-connexion.connect((err: mysql.MysqlError) => {
-  if (err) {
-    console.error("Error connecting to database:", err);
-    return;
-  }
-  console.log("Connection established");
-});
+// connexion.connect((err: mysql.MysqlError) => {
+//   if (err) {
+//     console.error("Error connecting to database:", err);
+//     return;
+//   }
+//   console.log("Connection established");
+// });
 
-connexion.query("SELECT * FROM users", (err, rows, fields) => {
-  if (err) throw err;
-  console.log("Data received from Db:", rows);
-});
+// connexion.query("SELECT * FROM users", (err, rows, fields) => {
+//   if (err) throw err;
+//   console.log("Data received from Db:", rows);
+// });
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
