@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import cors from "cors";
+import mysql from "mysql";
 
 import { userRouter } from "./user/user.router";
 import { roleRouter } from "./role/role.router";
@@ -58,6 +59,26 @@ app.use("/formations", formationRouter);
 app.use("/chapters", chapterRouter);
 app.use("/questions", questionRouter);
 app.use("/answers", answerRouter);
+
+const connexion = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+});
+
+connexion.connect((err: mysql.MysqlError) => {
+  if (err) {
+    console.error("Error connecting to database:", err);
+    return;
+  }
+  console.log("Connection established");
+});
+
+connexion.query("SELECT * FROM users", (err, rows, fields) => {
+  if (err) throw err;
+  console.log("Data received from Db:", rows);
+});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
