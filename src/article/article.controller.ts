@@ -1,5 +1,5 @@
 import { connect } from "http2";
-import { db } from "../db/db.server";
+import { db } from "../app";
 import { Request, Response } from "express";
 
 export const listArticles = async (req: Request, res: Response) => {
