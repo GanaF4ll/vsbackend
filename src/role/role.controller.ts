@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 
 export const listRoles = async (req: Request, res: Response) => {
   try {
-    const roles = db.roles.findMany({
+    const roles = await db.roles.findMany({
       select: {
         id: true,
         name: true,
