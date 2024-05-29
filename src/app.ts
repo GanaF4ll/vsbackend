@@ -7,6 +7,7 @@ import mysql from "mysql";
 import { userRouter } from "./user/user.router";
 import { roleRouter } from "./role/role.router";
 import { categoryRouter } from "./category/category.router";
+import { articleRouter } from "./article/article.router";
 import { formationRouter } from "./formation/formation.router";
 import { chapterRouter } from "./chapter/chapter.router";
 import { questionRouter } from "./question/question.router";
@@ -55,30 +56,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use("/users", userRouter);
 app.use("/roles", roleRouter);
 app.use("/categories", categoryRouter);
+app.use("/articles", articleRouter);
 app.use("/formations", formationRouter);
 app.use("/chapters", chapterRouter);
 app.use("/questions", questionRouter);
 app.use("/answers", answerRouter);
 
-const connexion = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
-
-connexion.connect((err: mysql.MysqlError) => {
-  if (err) {
-    console.error("Error connecting to database:", err);
-    return;
-  }
-  console.log("Connection established");
-});
-
-connexion.query("SELECT * FROM users", (err, rows, fields) => {
-  if (err) throw err;
-  console.log("Data received from Db:", rows);
-});
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
