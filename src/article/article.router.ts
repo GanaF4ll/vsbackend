@@ -1,5 +1,6 @@
 import * as ArticleController from "./article.controller";
 import { Router } from "express";
+import { creatorToken } from "../middleware/jwt";
 
 export const articleRouter = Router();
 
@@ -12,8 +13,8 @@ articleRouter.get(
   ArticleController.getArticleByCategory
 );
 
-articleRouter.post("/add", ArticleController.createArticle);
+articleRouter.post("/add", creatorToken, ArticleController.createArticle);
 
-articleRouter.put("/:id", ArticleController.updateArticle);
+articleRouter.put("/:id", creatorToken, ArticleController.updateArticle);
 
-articleRouter.delete("/:id", ArticleController.deleteArticle);
+articleRouter.delete("/:id", creatorToken, ArticleController.deleteArticle);
