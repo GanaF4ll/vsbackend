@@ -1,21 +1,10 @@
-import { db } from "../db/db.server";
+import { db } from "../app";
 import { hashSync, compareSync } from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
 
 dotenv.config();
-
-// type User = {
-//   id: number;
-//   firstName: string;
-//   lastName: string;
-//   birthdate: Date;
-//   mail: string;
-//   password: string;
-//   role_id: number;
-//   isPro: boolean;
-// };
 
 export const listUsers = async (req: Request, res: Response) => {
   try {
@@ -27,7 +16,7 @@ export const listUsers = async (req: Request, res: Response) => {
         birthdate: true,
         mail: true,
         role_id: true,
-        isPro: true,
+        gender: true,
       },
     });
     res.status(200).json(users);
@@ -52,11 +41,19 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const signup = async (req: Request, res: Response) => {
-  const { firstName, lastName, mail, password, role_id, isPro } = req.body;
+  const { firstName, lastName, mail, password, role_id, gender } = req.body;
 
   let user = await db.users.findFirst({ where: { mail } });
   if (user) {
     res.status(400).json({ message: "ERROR: User already exists !" });
+  }
+
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+  if (!passwordRegex.test(password)) {
+    return res
+      .status(400)
+      .json({ message: "ERROR: Password is not strong enough!" });
   }
 
   let birthdate: Date;
@@ -73,7 +70,7 @@ export const signup = async (req: Request, res: Response) => {
       birthdate,
       password: hashSync(password, 10),
       role_id,
-      isPro,
+      gender,
     },
   });
 
@@ -83,7 +80,23 @@ export const signup = async (req: Request, res: Response) => {
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { firstName, lastName, mail, password, role_id, isPro } = req.body;
+    const { firstName, lastName, mail, password, role_id, gender } = req.body;
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+    if (!passwordRegex.test(password)) {
+      return res
+        .status(400)
+        .json({ message: "ERROR: Password is not strong enough!" });
+    }
+
+    let birthdate: Date;
+    if (req.body.birthdate) {
+      birthdate = new Date(req.body.birthdate);
+    } else {
+      birthdate = new Date();
+    }
+
     await db.users.update({
       where: {
         id: parseInt(id),
@@ -94,7 +107,7 @@ export const updateUser = async (req: Request, res: Response) => {
         mail,
         password: hashSync(password, 10),
         role_id,
-        isPro,
+        gender,
       },
     });
 
@@ -131,16 +144,30 @@ export const login = async (req: Request, res: Response) => {
   if (!user) {
     return res.status(400).json({ message: "User not found" });
   }
-  // if (!compareSync(password, user.password)) {
-  //   return res
-  //     .status(400)
-  //     .json({ message: "Invalid combination of mail and password" });
-  // }
+
   const token = jwt.sign(
-    { id: user.id, mail: user.mail },
+    { id: user.id, mail: user.mail, role: user.role_id },
     process.env.TOKEN_SECRET as string,
     { noTimestamp: true }
   );
 
   res.status(200).json({ token });
+};
+
+export const sentinelUnlock = async (req: Request, res: Response) => {
+  const role_id = 5;
+  const id = parseInt(req.params.id);
+  let user = await db.users.findFirst({ where: { role_id } });
+  try {
+    await db.users.update({
+      where: { id },
+      data: {
+        role_id,
+      },
+    });
+    const updatedUser = await db.users.findUnique({ where: { id } });
+    res
+      .status(200)
+      .json({ message: `User ${id} is now a SENTINEL:`, updatedUser });
+  } catch (error) {}
 };
