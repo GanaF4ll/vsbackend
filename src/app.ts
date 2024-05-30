@@ -2,7 +2,6 @@ import express, { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import cors from "cors";
-import mysql from "mysql";
 
 import { userRouter } from "./user/user.router";
 import { roleRouter } from "./role/role.router";

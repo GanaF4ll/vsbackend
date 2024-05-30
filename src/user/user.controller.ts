@@ -42,27 +42,21 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const signup = async (req: Request, res: Response) => {
   const { firstName, lastName, mail, password, role_id, gender } = req.body;
-  console.log("====================================");
-  console.log("password:", password);
-  console.log("====================================");
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  console.log("====================================");
-  console.log("hashPassword:", hashedPassword);
-  console.log("====================================");
   let user = await db.users.findFirst({ where: { mail } });
   if (user) {
     res.status(400).json({ message: "ERROR: User already exists !" });
   }
 
-  // const passwordRegex =
-  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
-  // if (!passwordRegex.test(password)) {
-  //   return res
-  //     .status(400)
-  //     .json({ message: "ERROR: Password is not strong enough!" });
-  // }
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+  if (!passwordRegex.test(password)) {
+    return res
+      .status(400)
+      .json({ message: "ERROR: Password is not strong enough!" });
+  }
 
   let birthdate: Date;
   if (req.body.birthdate) {
