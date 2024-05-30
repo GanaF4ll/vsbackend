@@ -2,10 +2,12 @@ import express, { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import cors from "cors";
+import mysql from "mysql";
 
 import { userRouter } from "./user/user.router";
 import { roleRouter } from "./role/role.router";
 import { categoryRouter } from "./category/category.router";
+import { articleRouter } from "./article/article.router";
 import { formationRouter } from "./formation/formation.router";
 import { chapterRouter } from "./chapter/chapter.router";
 import { questionRouter } from "./question/question.router";
@@ -54,6 +56,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use("/users", userRouter);
 app.use("/roles", roleRouter);
 app.use("/categories", categoryRouter);
+app.use("/articles", articleRouter);
 app.use("/formations", formationRouter);
 app.use("/chapters", chapterRouter);
 app.use("/questions", questionRouter);

@@ -11,7 +11,7 @@ roleRouter.get("/all", adminToken, RoleController.listRoles);
 roleRouter.get("/:id", adminToken, RoleController.getRoleById);
 
 roleRouter.post(
-  "/",
+  "/add",
   adminToken,
   body("name").isString().notEmpty(),
   RoleController.createRole
