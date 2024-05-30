@@ -1,5 +1,5 @@
 import { db } from "../app";
-import { hashSync, compareSync } from "bcrypt";
+import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { Request, Response } from "express";
@@ -42,19 +42,27 @@ export const getUserById = async (req: Request, res: Response) => {
 
 export const signup = async (req: Request, res: Response) => {
   const { firstName, lastName, mail, password, role_id, gender } = req.body;
+  console.log("====================================");
+  console.log("password:", password);
+  console.log("====================================");
 
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  console.log("====================================");
+  console.log("hashPassword:", hashedPassword);
+  console.log("====================================");
   let user = await db.users.findFirst({ where: { mail } });
   if (user) {
     res.status(400).json({ message: "ERROR: User already exists !" });
   }
 
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
-  if (!passwordRegex.test(password)) {
-    return res
-      .status(400)
-      .json({ message: "ERROR: Password is not strong enough!" });
-  }
+  // const passwordRegex =
+  //   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,}$/;
+  // if (!passwordRegex.test(password)) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: "ERROR: Password is not strong enough!" });
+  // }
 
   let birthdate: Date;
   if (req.body.birthdate) {
@@ -68,7 +76,7 @@ export const signup = async (req: Request, res: Response) => {
       lastName,
       mail,
       birthdate,
-      password: hashSync(password, 10),
+      password: hashedPassword,
       role_id,
       gender,
     },
@@ -105,7 +113,7 @@ export const updateUser = async (req: Request, res: Response) => {
         firstName,
         lastName,
         mail,
-        password: hashSync(password, 10),
+        password: await bcrypt.hash(password, 10),
         role_id,
         gender,
       },
@@ -141,8 +149,15 @@ export const deleteUser = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const { mail, password } = req.body;
   let user = await db.users.findFirst({ where: { mail } });
+
   if (!user) {
-    return res.status(400).json({ message: "User not found" });
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordMatch) {
+    return res.status(401).json({ message: "Invalid password" });
   }
 
   const token = jwt.sign(
