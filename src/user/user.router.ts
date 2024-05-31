@@ -11,6 +11,8 @@ userRouter.get("/:id", UserController.getUserById);
 // Params: firstName, lastName, mail, birthdate, password, role_id, isPro
 userRouter.post("/signup", UserController.signup);
 
+userRouter.get("/name/:name", UserController.getUserByName);
+
 userRouter.put("/:id", userToken, UserController.updateUser);
 
 userRouter.delete("/:id", userToken, UserController.deleteUser);
