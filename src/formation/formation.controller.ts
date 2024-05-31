@@ -1,6 +1,10 @@
 import { db } from "../app";
 import { Request, Response } from "express";
 
+////////////////////////////////////////
+/////////////////GET////////////////////
+////////////////////////////////////////
+
 export const listFormations = async (req: Request, res: Response) => {
   try {
     const formations = await db.formations.findMany({
@@ -147,6 +151,38 @@ export const getFormationByCategory = async (req: Request, res: Response) => {
   }
 };
 
+export const getFormationByTitle = async (req: Request, res: Response) => {
+  const title = req.params.title;
+  try {
+    const formations = await db.formations.findMany({
+      select: {
+        id: true,
+        author_id: true,
+        title: true,
+        description: true,
+        video: true,
+        category_id: true,
+        difficulty: true,
+        completionTime: true,
+        qualityRating: true,
+        coverImage: true,
+      },
+      where: { title: { contains: title } },
+    });
+    res.status(200).json(formations);
+    console.log(`Searching for formations with title: ${title}`);
+    console.log(typeof title);
+    console.log(`Found formations: ${JSON.stringify(formations)}`);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: "No formations found with this title" });
+  }
+};
+
+////////////////////////////////////////
+/////////////////POST///////////////////
+////////////////////////////////////////
+
 export const createFormation = async (req: Request, res: Response) => {
   try {
     const {
@@ -186,6 +222,10 @@ export const createFormation = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Formation not created" });
   }
 };
+
+////////////////////////////////////////
+/////////////////PUT////////////////////
+////////////////////////////////////////
 
 export const updateFormation = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
@@ -232,6 +272,10 @@ export const updateFormation = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Formation not updated" });
   }
 };
+
+////////////////////////////////////////
+/////////////////DELETE/////////////////
+////////////////////////////////////////
 
 export const deleteFormation = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);

@@ -15,6 +15,8 @@ formationRouter.get(
   FormationController.getFormationByCategory
 );
 
+formationRouter.get("/title/:title", FormationController.getFormationByTitle);
+
 formationRouter.post("/add", creatorToken, FormationController.createFormation);
 
 formationRouter.put("/:id", creatorToken, FormationController.updateFormation);
