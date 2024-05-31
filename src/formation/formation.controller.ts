@@ -170,9 +170,6 @@ export const getFormationByTitle = async (req: Request, res: Response) => {
       where: { title: { contains: title } },
     });
     res.status(200).json(formations);
-    console.log(`Searching for formations with title: ${title}`);
-    console.log(typeof title);
-    console.log(`Found formations: ${JSON.stringify(formations)}`);
   } catch (error: any) {
     console.error(error);
     res.status(500).json({ message: "No formations found with this title" });
@@ -203,6 +200,18 @@ export const createFormation = async (req: Request, res: Response) => {
       completionTime = new Date();
     }
 
+    let imageUrl: string = "";
+
+    if (category_id === 1) {
+      imageUrl = "../../assets/images/formation/mock1.jpg";
+    } else if (category_id === 2) {
+      imageUrl = "../../assets/images/formation/mock2.png";
+    } else if (category_id === 3) {
+      imageUrl = "../../assets/images/formation/mock3.jpg";
+    } else if (category_id === 4) {
+      imageUrl = "../../assets/images/formation/mock4.jpg";
+    }
+
     let formation = await db.formations.create({
       data: {
         title,
@@ -211,7 +220,7 @@ export const createFormation = async (req: Request, res: Response) => {
         difficulty,
         completionTime,
         qualityRating,
-        coverImage,
+        coverImage: imageUrl,
         author: { connect: { id: author_id } },
         category: { connect: { id: category_id } },
       },
