@@ -6,6 +6,10 @@ import { Request, Response } from "express";
 
 dotenv.config();
 
+////////////////////////////////////////
+/////////////////GET////////////////////
+////////////////////////////////////////
+
 export const listUsers = async (req: Request, res: Response) => {
   try {
     const users = await db.users.findMany({
@@ -39,6 +43,28 @@ export const getUserById = async (req: Request, res: Response) => {
     res.status(404).json({ message: "No user found with that id" });
   }
 };
+
+export const getUserByName = async (req: Request, res: Response) => {
+  let name = req.params.name;
+  try {
+    const user = await db.users.findMany({
+      where: {
+        OR: [
+          { firstName: { contains: name } },
+          { lastName: { contains: name } },
+        ],
+      },
+    });
+    res.status(200).json(user);
+  } catch (error: any) {
+    console.error(error);
+    res.status(404).json({ message: "No user found with that name" });
+  }
+};
+
+////////////////////////////////////////
+/////////////////POST///////////////////
+////////////////////////////////////////
 
 export const signup = async (req: Request, res: Response) => {
   const { firstName, lastName, mail, password, role_id, gender } = req.body;
@@ -79,6 +105,32 @@ export const signup = async (req: Request, res: Response) => {
   res.status(201).json(user);
 };
 
+export const login = async (req: Request, res: Response) => {
+  const { mail, password } = req.body;
+  let user = await db.users.findFirst({ where: { mail } });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordMatch) {
+    return res.status(401).json({ message: "Invalid password" });
+  }
+
+  const token = jwt.sign(
+    { id: user.id, mail: user.mail, role: user.role_id },
+    process.env.TOKEN_SECRET as string,
+    { noTimestamp: true }
+  );
+
+  res.status(200).json({ token });
+};
+
+////////////////////////////////////////
+/////////////////PUT////////////////////
+////////////////////////////////////////
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -126,43 +178,6 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
-  const id: number = parseInt(req.params.id);
-  try {
-    const user = await db.users.delete({
-      where: {
-        id,
-      },
-    });
-    res.status(200).json({ message: "User deleted : ", user });
-  } catch (error: any) {
-    res.status(500).json({ message: "User not deleted" });
-  }
-};
-
-export const login = async (req: Request, res: Response) => {
-  const { mail, password } = req.body;
-  let user = await db.users.findFirst({ where: { mail } });
-
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
-  const isPasswordMatch = await bcrypt.compare(password, user.password);
-
-  if (!isPasswordMatch) {
-    return res.status(401).json({ message: "Invalid password" });
-  }
-
-  const token = jwt.sign(
-    { id: user.id, mail: user.mail, role: user.role_id },
-    process.env.TOKEN_SECRET as string,
-    { noTimestamp: true }
-  );
-
-  res.status(200).json({ token });
-};
-
 export const sentinelUnlock = async (req: Request, res: Response) => {
   const role_id = 5;
   const id = parseInt(req.params.id);
@@ -179,4 +194,22 @@ export const sentinelUnlock = async (req: Request, res: Response) => {
       .status(200)
       .json({ message: `User ${id} is now a SENTINEL:`, updatedUser });
   } catch (error) {}
+};
+
+////////////////////////////////////////
+/////////////////DELETE/////////////////
+////////////////////////////////////////
+
+export const deleteUser = async (req: Request, res: Response) => {
+  const id: number = parseInt(req.params.id);
+  try {
+    const user = await db.users.delete({
+      where: {
+        id,
+      },
+    });
+    res.status(200).json({ message: "User deleted : ", user });
+  } catch (error: any) {
+    res.status(500).json({ message: "User not deleted" });
+  }
 };
