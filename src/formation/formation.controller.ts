@@ -190,15 +190,9 @@ export const createFormation = async (req: Request, res: Response) => {
       category_id,
       difficulty,
       qualityRating,
+      completionTime,
       coverImage,
     } = req.body;
-
-    let completionTime: Date;
-    if (req.body.completionTime) {
-      completionTime = new Date(req.body.completionTime);
-    } else {
-      completionTime = new Date();
-    }
 
     let imageUrl: string = "";
 
@@ -246,16 +240,10 @@ export const updateFormation = async (req: Request, res: Response) => {
       video,
       category_id,
       difficulty,
+      completionTime,
       qualityRating,
       coverImage,
     } = req.body;
-
-    let completionTime: Date;
-    if (req.body.completionTime) {
-      completionTime = new Date(req.body.completionTime);
-    } else {
-      completionTime = new Date();
-    }
 
     await db.formations.update({
       where: { id },

@@ -61,7 +61,7 @@ model Formations {
   video          String     @db.VarChar(50)
   category_id    Int
   difficulty     String     @db.VarChar(10)
-  completionTime Int?
+  completionTime Int
   qualityRating  Int
   coverImage     String     @db.VarChar(50)
   createdAt      DateTime   @default(now())
