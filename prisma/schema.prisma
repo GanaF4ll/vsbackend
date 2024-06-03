@@ -118,7 +118,7 @@ model Users {
   birthdate    DateTime      @db.Date
   mail         String        @db.VarChar(50)
   password     String        @db.VarChar(500)
-  role_id      Int           @default(2)
+  role_id      Int           @default(3)
   gender       String        @db.VarChar(10)
   createdAt    DateTime      @default(now())
   modifiedAt   DateTime?     @default(now())
