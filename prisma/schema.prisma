@@ -8,106 +8,124 @@ datasource db {
 }
 
 model Answers {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   question_id Int
-  question    Questions @relation(fields: [question_id], references: [id])
-  content     String   @db.Text
+  content     String    @db.Text
   valid       Boolean
+  question    Questions @relation(fields: [question_id], references: [id])
+
+  @@index([question_id], map: "Answers_question_id_fkey")
 }
 
 model Articles {
-  id          Int      @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   author_id   Int
-  author      Users     @relation("ArticleAuthor", fields: [author_id], references: [id])
-  title       String   @db.Text
-  content     String   @db.Text
+  title       String     @db.Text
+  content     String     @db.Text
   category_id Int
+  coverImage  String     @db.VarChar(50)
+  createdAt   DateTime   @default(now())
+  modifiedAt  DateTime   @default(now())
+  author      Users      @relation("ArticleAuthor", fields: [author_id], references: [id])
   category    Categories @relation(fields: [category_id], references: [id])
-  coverImage  String   @db.VarChar(50)
-  createdAt   DateTime @default(now())
-  modifiedAt  DateTime @default(now())
+
+  @@index([author_id], map: "Articles_author_id_fkey")
+  @@index([category_id], map: "Articles_category_id_fkey")
 }
 
 model Categories {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar(50)
+  id         Int          @id @default(autoincrement())
+  name       String       @db.VarChar(50)
+  articles   Articles[]
   formations Formations[]
-  articles  Articles[]
 }
 
 model Chapters {
-  id             Int        @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   formation_id   Int
-  formation      Formations  @relation(fields: [formation_id], references: [id])
-  title          String     @db.VarChar(50)
-  content        String     @db.Text
+  title          String         @db.VarChar(50)
+  content        String         @db.Text
   chapter_number Int
+  formation      Formations     @relation(fields: [formation_id], references: [id])
   progression    Progressions[]
   questions      Questions[]
+
+  @@index([formation_id], map: "Chapters_formation_id_fkey")
 }
 
 model Formations {
-  id             Int         @id @default(autoincrement())
+  id             Int        @id @default(autoincrement())
   author_id      Int
-  author         Users        @relation("FormationAuthor", fields: [author_id], references: [id])
-  title          String      @db.VarChar(50)
-  description    String      @db.Text
-  video          String      @db.VarChar(50)
+  title          String     @db.VarChar(50)
+  description    String     @db.Text
+  video          String     @db.VarChar(50)
   category_id    Int
-  category       Categories    @relation(fields: [category_id], references: [id])
-  difficulty     String      @db.VarChar(10)
-  completionTime DateTime    @db.Date
+  difficulty     String     @db.VarChar(10)
+  completionTime Int
   qualityRating  Int
-  coverImage     String      @db.VarChar(50)
+  coverImage     String     @db.VarChar(50)
+  createdAt      DateTime   @default(now())
+  modifiedAt     DateTime   @default(now())
   chapters       Chapters[]
+  author         Users      @relation("FormationAuthor", fields: [author_id], references: [id])
+  category       Categories @relation(fields: [category_id], references: [id])
   ratings        Ratings[]
-  createdAt      DateTime    @default(now())
-  modifiedAt     DateTime    @default(now())
+
+  @@index([author_id], map: "Formations_author_id_fkey")
+  @@index([category_id], map: "Formations_category_id_fkey")
 }
 
 model Progressions {
-  user_id     Int     @id
-  user        Users    @relation(fields: [user_id], references: [id])
+  user_id     Int      @id
   progression Int
   grade       Int
   chapter_id  Int
   chapter     Chapters @relation(fields: [chapter_id], references: [id])
+  user        Users    @relation(fields: [user_id], references: [id])
+
+  @@index([chapter_id], map: "Progressions_chapter_id_fkey")
 }
 
 model Questions {
-  id         Int      @id @default(autoincrement())
-  content   String   @db.Text
+  id         Int       @id @default(autoincrement())
+  content    String    @db.Text
   chapter_id Int
-  chapter    Chapters  @relation(fields: [chapter_id], references: [id])
   answers    Answers[]
+  chapter    Chapters  @relation(fields: [chapter_id], references: [id])
+
+  @@index([chapter_id], map: "Questions_chapter_id_fkey")
 }
 
 model Ratings {
   id           Int        @id @default(autoincrement())
   formation_id Int
-  formation    Formations  @relation(fields: [formation_id], references: [id])
   grade        Int
+  formation    Formations @relation(fields: [formation_id], references: [id])
+
+  @@index([formation_id], map: "Ratings_formation_id_fkey")
 }
 
 model Roles {
-  id    Int    @id @default(autoincrement())
-  name  String @db.VarChar(50)
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(50)
   users Users[]
 }
 
 model Users {
-  id         Int        @id @default(autoincrement())
-  firstName  String     @db.VarChar(50)
-  lastName   String     @db.VarChar(50)
-  birthdate  DateTime   @db.Date
-  mail       String     @db.VarChar(50)
-  password   String     @db.VarChar(500)
-  role_id    Int        @default(2)
-  gender     String     @db.VarChar(10)
-  role       Roles       @relation(fields: [role_id], references: [id])
-  articles   Articles[]  @relation("ArticleAuthor")
-  formations Formations[] @relation("FormationAuthor")
-  progressions Progressions[]
-  createdAt  DateTime   @default(now())
-  modifiedAt DateTime?  @default(now())
+  id           Int           @id @default(autoincrement())
+  firstName    String        @db.VarChar(50)
+  lastName     String        @db.VarChar(50)
+  birthdate    DateTime      @db.Date
+  mail         String        @db.VarChar(50)
+  password     String        @db.VarChar(500)
+  role_id      Int           @default(3)
+  gender       String        @db.VarChar(10)
+  createdAt    DateTime      @default(now())
+  modifiedAt   DateTime?     @default(now())
+  articles     Articles[]    @relation("ArticleAuthor")
+  formations   Formations[]  @relation("FormationAuthor")
+  progressions Progressions?
+  role         Roles         @relation(fields: [role_id], references: [id])
+
+  @@index([role_id], map: "Users_role_id_fkey")
 }
