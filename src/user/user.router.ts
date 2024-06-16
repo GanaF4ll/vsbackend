@@ -8,10 +8,11 @@ userRouter.get("/all", UserController.listUsers);
 
 userRouter.get("/:id", UserController.getUserById);
 
+userRouter.get("/name/:name", UserController.getUserByName);
+
+userRouter.get("/mail/:mail", UserController.getUserByMail);
 // Params: firstName, lastName, mail, birthdate, password, role_id, isPro
 userRouter.post("/signup", UserController.signup);
-
-userRouter.get("/name/:name", UserController.getUserByName);
 
 userRouter.put("/:id", userToken, UserController.updateUser);
 

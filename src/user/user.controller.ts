@@ -62,6 +62,27 @@ export const getUserByName = async (req: Request, res: Response) => {
   }
 };
 
+export const getUserByMail = async (req: Request, res: Response) => {
+  let mail = req.params.mail;
+  try {
+    const user = await db.users.findFirst({
+      where: {
+        mail,
+      },
+    });
+    if (user) {
+      res.status(200).json(user.mail);
+    } else {
+      res.status(404).json({ message: "No user found with that email" });
+    }
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while processing your request." });
+  }
+};
+
 ////////////////////////////////////////
 /////////////////POST///////////////////
 ////////////////////////////////////////
