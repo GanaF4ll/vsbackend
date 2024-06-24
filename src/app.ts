@@ -30,7 +30,7 @@ export { db };
 
 app.use(cors());
 app.use(express.json());
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || process.env.TEST_PORT;
 
 app.use(cors());
 

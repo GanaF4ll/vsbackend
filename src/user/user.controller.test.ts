@@ -2,9 +2,10 @@ import request from "supertest";
 import { app } from "../app";
 import { db } from "../app";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 describe("UserController", () => {
-  let newUser: any;
+  let userMock: any;
 
   beforeAll(async () => {
     await db.$connect();
@@ -15,12 +16,17 @@ describe("UserController", () => {
   });
 
   beforeEach(async () => {
-    newUser = await db.users.create({
+    const plainPassword = "Password?24";
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
+    // console.log("Plain password: ", plainPassword);
+    // console.log("Hashed password: ", hashedPassword);
+
+    userMock = await db.users.create({
       data: {
         firstName: "Test",
         lastName: "User",
         birthdate: new Date("1990-01-01"),
-        password: await bcrypt.hash("Password?24", 10),
+        password: hashedPassword,
         mail: "test.user@example.com",
         role_id: 1,
         gender: "male",
@@ -29,9 +35,9 @@ describe("UserController", () => {
   });
 
   afterEach(async () => {
-    if (newUser) {
+    if (userMock) {
       await db.users.delete({
-        where: { id: newUser.id },
+        where: { id: userMock.id },
       });
     }
   });
@@ -62,14 +68,14 @@ describe("UserController", () => {
 
   describe("getUserById", () => {
     it("should return a user by ID", async () => {
-      const response = await request(app).get(`/users/${newUser.id}`);
+      const response = await request(app).get(`/users/${userMock.id}`);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(
         expect.objectContaining({
-          id: newUser.id,
+          id: userMock.id,
           firstName: "Test",
           lastName: "User",
-          birthdate: newUser.birthdate.toISOString(),
+          birthdate: userMock.birthdate.toISOString(),
           mail: "test.user@example.com",
           role_id: 1,
           gender: "male",
@@ -87,11 +93,11 @@ describe("UserController", () => {
   describe("getUserByName", () => {
     it("should return a list of users filtered by their name", async () => {
       const response = await request(app).get(
-        `/users/name/${newUser.firstName}`
+        `/users/name/${userMock.firstName}`
       );
       expect(response.status).toBe(200);
       const userIdsInResponse = response.body.map((user: any) => user.id);
-      expect(userIdsInResponse).toContain(newUser.id);
+      expect(userIdsInResponse).toContain(userMock.id);
     });
 
     it("should return 404 if user not found", async () => {
@@ -105,14 +111,14 @@ describe("UserController", () => {
 
   describe("getUserByMail", () => {
     it("should return a user by mail", async () => {
-      const response = await request(app).get(`/users/mail/${newUser.mail}`);
+      const response = await request(app).get(`/users/mail/${userMock.mail}`);
       expect(response.status).toBe(200);
-      expect(response.body.firstName).toBe(newUser.firstName);
-      expect(response.body.lastName).toBe(newUser.lastName);
-      expect(new Date(response.body.birthdate)).toEqual(newUser.birthdate);
-      expect(response.body.mail).toBe(newUser.mail);
-      expect(response.body.role_id).toBe(newUser.role_id);
-      expect(response.body.gender).toBe(newUser.gender);
+      expect(response.body.firstName).toBe(userMock.firstName);
+      expect(response.body.lastName).toBe(userMock.lastName);
+      expect(new Date(response.body.birthdate)).toEqual(userMock.birthdate);
+      expect(response.body.mail).toBe(userMock.mail);
+      expect(response.body.role_id).toBe(userMock.role_id);
+      expect(response.body.gender).toBe(userMock.gender);
     });
 
     it("should return 404 if user not found", async () => {
@@ -207,6 +213,54 @@ describe("UserController", () => {
       expect(response.body).toEqual({
         message: "ERROR: Password is not strong enough!",
       });
+    });
+  });
+
+  describe("login", () => {
+    // it("should log in successfully with correct credentials", async () => {
+    //   const response = await request(app).post("/users/login").send({
+    //     mail: "test.user@example.com",
+    //     password: "Password?24",
+    //   });
+
+    //   console.log("Response: ", response.body);
+
+    //   expect(response.status).toBe(200);
+    //   expect(response.body).toHaveProperty("token");
+
+    //   const decodedToken = jwt.verify(
+    //     response.body.token,
+    //     process.env.TOKEN_SECRET as string
+    //   );
+    //   console.log("Decoded token: ", decodedToken);
+
+    //   expect(decodedToken).toEqual(
+    //     expect.objectContaining({
+    //       id: userMock.id,
+    //       mail: userMock.mail,
+    //       role: userMock.role_id,
+    //     })
+    //   );
+    // });
+
+    it("should return 404 if user is not found", async () => {
+      const response = await request(app).post("/users/login").send({
+        mail: "nonexistent@example.com",
+        password: "Password?24",
+      });
+
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ message: "User not found" });
+    });
+
+    it("should return 401 if the password is incorrect", async () => {
+      const response = await request(app).post("/users/login").send({
+        mail: "test.user@example.com",
+        password: "WrongPassword",
+      });
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ message: "Invalid password" });
     });
   });
 });
