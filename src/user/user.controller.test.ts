@@ -11,6 +11,9 @@ afterAll(async () => {
 });
 
 describe("UserController", () => {
+  ////////////////////////////////////////
+  /////////////////GET////////////////////
+  ////////////////////////////////////////
   describe("listUsers", () => {
     it("should return a list of users", async () => {
       const response = await request(app).get("/users/all");
@@ -103,6 +106,36 @@ describe("UserController", () => {
       expect(response.status).toBe(404);
       expect(response.body).toEqual({
         message: "No user found with that name",
+      });
+    });
+  });
+
+  describe("getUserByMail", () => {
+    it("should return a user by mail", async () => {
+      const newUser = await db.users.create({
+        data: {
+          firstName: "Test",
+          lastName: "User",
+          birthdate: new Date("1990-01-01"),
+          password: "Password?24",
+          mail: "test.user@example.com",
+          role_id: 1,
+          gender: "male",
+        },
+      });
+
+      const response = await request(app).get(`/users/mail/${newUser.mail}`);
+      expect(response.status).toBe(200);
+
+      expect(response.body.firstName).toBe(newUser.firstName);
+      expect(response.body.lastName).toBe(newUser.lastName);
+      expect(new Date(response.body.birthdate)).toEqual(newUser.birthdate);
+      expect(response.body.mail).toBe(newUser.mail);
+      expect(response.body.role_id).toBe(newUser.role_id);
+      expect(response.body.gender).toBe(newUser.gender);
+
+      await db.users.delete({
+        where: { id: newUser.id },
       });
     });
   });
