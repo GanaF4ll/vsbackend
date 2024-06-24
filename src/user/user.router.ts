@@ -1,29 +1,22 @@
-import express, { Request, Response } from "express";
-import * as UserController from "./user.controller";
+// src/user/user.router.ts
+
+import express from "express";
+import * as UserController from "./user.controller"; // Ensure this path is correct
 import { userToken, adminToken } from "../middleware/jwt";
 
 export const userRouter = express.Router();
 
+// Define routes using imported UserController functions
 userRouter.get("/all", UserController.listUsers);
-
 userRouter.get("/:id", UserController.getUserById);
-
 userRouter.get("/name/:name", UserController.getUserByName);
-
 userRouter.get("/mail/:mail", UserController.getUserByMail);
-// Params: firstName, lastName, mail, birthdate, password, role_id, isPro
 userRouter.post("/signup", UserController.signup);
-
-userRouter.put("/:id", userToken, UserController.updateUser);
-
-userRouter.delete("/:id", userToken, UserController.deleteUser);
-
 userRouter.post("/login", UserController.login);
-
+userRouter.put("/:id", userToken, UserController.updateUser);
 userRouter.put("/pro/:id", userToken, UserController.sentinelUnlock);
 
-// ADMIN ROUTES
-
+// Admin routes
 userRouter.put("/admin/:id", adminToken, UserController.updateUser);
-
-userRouter.delete("/:id", adminToken, UserController.deleteUser);
+userRouter.delete("/:id", userToken, UserController.deleteUser);
+userRouter.delete("/admin/:id", adminToken, UserController.deleteUser);
