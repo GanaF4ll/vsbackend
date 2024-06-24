@@ -71,7 +71,7 @@ export const getUserByMail = async (req: Request, res: Response) => {
       },
     });
     if (user) {
-      res.status(200).json(user.mail);
+      res.status(200).json(user);
     } else {
       res.status(404).json({ message: "No user found with that email" });
     }
