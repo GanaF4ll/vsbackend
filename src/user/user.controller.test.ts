@@ -1,6 +1,8 @@
 import request from "supertest";
 import { app } from "../app";
 import { db } from "../app";
+import bcrypt from "bcrypt";
+
 describe("UserController", () => {
   let newUser: any;
 
@@ -18,7 +20,7 @@ describe("UserController", () => {
         firstName: "Test",
         lastName: "User",
         birthdate: new Date("1990-01-01"),
-        password: "Password?24",
+        password: await bcrypt.hash("Password?24", 10),
         mail: "test.user@example.com",
         role_id: 1,
         gender: "male",
@@ -111,6 +113,100 @@ describe("UserController", () => {
       expect(response.body.mail).toBe(newUser.mail);
       expect(response.body.role_id).toBe(newUser.role_id);
       expect(response.body.gender).toBe(newUser.gender);
+    });
+
+    it("should return 404 if user not found", async () => {
+      const response = await request(app).get("/users/mail/test");
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({
+        message: "No user found with that email",
+      });
+    });
+  });
+
+  ////////////////////////////////////////
+  /////////////////POST///////////////////
+  ////////////////////////////////////////
+  describe("signup", () => {
+    it("should create a new user successfully", async () => {
+      const response = await request(app).post("/users/signup").send({
+        firstName: "John",
+        lastName: "Doe",
+        mail: "john.doe@example.com",
+        password: "Password?24",
+        role_id: 1,
+        gender: "male",
+        birthdate: "1990-01-01",
+      });
+
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual(
+        expect.objectContaining({
+          id: expect.any(Number),
+          firstName: "John",
+          lastName: "Doe",
+          mail: "john.doe@example.com",
+          role_id: 1,
+          gender: "male",
+          birthdate: "1990-01-01T00:00:00.000Z",
+        })
+      );
+
+      // Clean up
+      await db.users.delete({
+        where: { id: response.body.id },
+      });
+    });
+
+    it("should return an error if the email already exists", async () => {
+      const existingUser = await db.users.create({
+        data: {
+          firstName: "Existing",
+          lastName: "User",
+          mail: "existing.user@example.com", // Utilisez un email qui existe déjà
+          password: await bcrypt.hash("Password?24", 10),
+          role_id: 1,
+          gender: "male",
+          birthdate: new Date("1990-01-01"),
+        },
+      });
+
+      const response = await request(app).post("/users/signup").send({
+        firstName: "Jane",
+        lastName: "Doe",
+        mail: "existing.user@example.com", // Utilisez le même email
+        password: "Password?24",
+        role_id: 1,
+        gender: "female",
+        birthdate: "1990-01-01",
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        message: "ERROR: User already exists !",
+      });
+
+      // Clean up
+      await db.users.delete({
+        where: { id: existingUser.id },
+      });
+    });
+
+    it("should return an error if the password is not strong enough", async () => {
+      const response = await request(app).post("/users/signup").send({
+        firstName: "John",
+        lastName: "Weak",
+        mail: "john.weakpass@example.com",
+        password: "weakpass",
+        role_id: 1,
+        gender: "male",
+        birthdate: "1990-01-01",
+      });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        message: "ERROR: Password is not strong enough!",
+      });
     });
   });
 });

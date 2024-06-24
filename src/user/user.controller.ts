@@ -103,7 +103,7 @@ export const signup = async (req: Request, res: Response) => {
 
   let user = await db.users.findFirst({ where: { mail } });
   if (user) {
-    res.status(400).json({ message: "ERROR: User already exists !" });
+    return res.status(400).json({ message: "ERROR: User already exists !" });
   }
 
   const passwordRegex =
@@ -132,7 +132,7 @@ export const signup = async (req: Request, res: Response) => {
     },
   });
 
-  res.status(201).json(user);
+  return res.status(201).json(user);
 };
 
 export const login = async (req: Request, res: Response) => {
