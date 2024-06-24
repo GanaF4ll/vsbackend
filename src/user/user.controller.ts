@@ -37,10 +37,15 @@ export const getUserById = async (req: Request, res: Response) => {
         id: parseInt(req.params.id),
       },
     });
+
+    if (user === null) {
+      return res.status(404).json({ message: "No user found with that id" });
+    }
+    // console.log(user);
     res.status(200).json(user);
   } catch (error: any) {
     console.error(error);
-    res.status(404).json({ message: "No user found with that id" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -55,6 +60,10 @@ export const getUserByName = async (req: Request, res: Response) => {
         ],
       },
     });
+
+    if (user.length === 0) {
+      return res.status(404).json({ message: "No user found with that name" });
+    }
     res.status(200).json(user);
   } catch (error: any) {
     console.error(error);

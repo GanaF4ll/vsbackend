@@ -1,12 +1,11 @@
 // src/user/user.router.ts
 
 import express from "express";
-import * as UserController from "./user.controller"; // Ensure this path is correct
+import * as UserController from "./user.controller";
 import { userToken, adminToken } from "../middleware/jwt";
 
 export const userRouter = express.Router();
 
-// Define routes using imported UserController functions
 userRouter.get("/all", UserController.listUsers);
 userRouter.get("/:id", UserController.getUserById);
 userRouter.get("/name/:name", UserController.getUserByName);
