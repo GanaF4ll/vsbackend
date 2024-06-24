@@ -1,20 +1,31 @@
-import { Request, Response } from "express";
-import { getUserById } from "./user.controller";
+import request from "supertest";
+import { app } from "../app";
+import { db } from "../app";
 
-const mockUser = { id: 1, name: "John Doe" };
+beforeAll(async () => {
+  await db.$connect();
+});
 
-test("getUserById should return the user with the specified id", async () => {
-  const mockRequest = {
-    params: {
-      id: "1",
-    },
-  } as Partial<Request> as Request;
+afterAll(async () => {
+  await db.$disconnect();
+});
 
-  const mockResponse = {
-    json: jest.fn(),
-  } as Partial<Response> as Response;
-
-  await getUserById(mockRequest, mockResponse);
-
-  expect(mockResponse.json).toHaveBeenCalledWith(mockUser);
+describe("UserController.listUsers", () => {
+  it("should return a list of users", async () => {
+    const response = await request(app).get("/users/all");
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: expect.any(Number),
+          firstName: expect.any(String),
+          lastName: expect.any(String),
+          birthdate: expect.any(String),
+          mail: expect.any(String),
+          role_id: expect.any(Number),
+          gender: expect.any(String),
+        }),
+      ])
+    );
+  });
 });

@@ -14,7 +14,7 @@ import { answerRouter } from "./answer/answer.router";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 let db: PrismaClient;
 
 declare global {
