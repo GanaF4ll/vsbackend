@@ -1,19 +1,43 @@
 import request from "supertest";
 import { app } from "../app";
 import { db } from "../app";
-
-beforeAll(async () => {
-  await db.$connect();
-});
-
-afterAll(async () => {
-  await db.$disconnect();
-});
-
 describe("UserController", () => {
+  let newUser: any;
+
+  beforeAll(async () => {
+    await db.$connect();
+  });
+
+  afterAll(async () => {
+    await db.$disconnect();
+  });
+
+  beforeEach(async () => {
+    newUser = await db.users.create({
+      data: {
+        firstName: "Test",
+        lastName: "User",
+        birthdate: new Date("1990-01-01"),
+        password: "Password?24",
+        mail: "test.user@example.com",
+        role_id: 1,
+        gender: "male",
+      },
+    });
+  });
+
+  afterEach(async () => {
+    if (newUser) {
+      await db.users.delete({
+        where: { id: newUser.id },
+      });
+    }
+  });
+
   ////////////////////////////////////////
   /////////////////GET////////////////////
   ////////////////////////////////////////
+
   describe("listUsers", () => {
     it("should return a list of users", async () => {
       const response = await request(app).get("/users/all");
@@ -36,20 +60,6 @@ describe("UserController", () => {
 
   describe("getUserById", () => {
     it("should return a user by ID", async () => {
-      // Mock user
-      const newUser = await db.users.create({
-        data: {
-          // id: 667,
-          firstName: "Test",
-          lastName: "User",
-          birthdate: new Date("1990-01-01"),
-          password: "Password?24",
-          mail: "test.user@example.com",
-          role_id: 1,
-          gender: "male",
-        },
-      });
-
       const response = await request(app).get(`/users/${newUser.id}`);
       expect(response.status).toBe(200);
       expect(response.body).toEqual(
@@ -63,10 +73,6 @@ describe("UserController", () => {
           gender: "male",
         })
       );
-
-      await db.users.delete({
-        where: { id: newUser.id },
-      });
     });
 
     it("should return 404 if user not found", async () => {
@@ -78,26 +84,11 @@ describe("UserController", () => {
 
   describe("getUserByName", () => {
     it("should return a list of users filtered by their name", async () => {
-      const newUser = await db.users.create({
-        data: {
-          firstName: "Test",
-          lastName: "User",
-          birthdate: new Date("1990-01-01"),
-          password: "Password?24",
-          mail: "test.user@example.com",
-          role_id: 1,
-          gender: "male",
-        },
-      });
-
       const response = await request(app).get(
         `/users/name/${newUser.firstName}`
       );
-
       expect(response.status).toBe(200);
-
       const userIdsInResponse = response.body.map((user: any) => user.id);
-
       expect(userIdsInResponse).toContain(newUser.id);
     });
 
@@ -112,31 +103,14 @@ describe("UserController", () => {
 
   describe("getUserByMail", () => {
     it("should return a user by mail", async () => {
-      const newUser = await db.users.create({
-        data: {
-          firstName: "Test",
-          lastName: "User",
-          birthdate: new Date("1990-01-01"),
-          password: "Password?24",
-          mail: "test.user@example.com",
-          role_id: 1,
-          gender: "male",
-        },
-      });
-
       const response = await request(app).get(`/users/mail/${newUser.mail}`);
       expect(response.status).toBe(200);
-
       expect(response.body.firstName).toBe(newUser.firstName);
       expect(response.body.lastName).toBe(newUser.lastName);
       expect(new Date(response.body.birthdate)).toEqual(newUser.birthdate);
       expect(response.body.mail).toBe(newUser.mail);
       expect(response.body.role_id).toBe(newUser.role_id);
       expect(response.body.gender).toBe(newUser.gender);
-
-      await db.users.delete({
-        where: { id: newUser.id },
-      });
     });
   });
 });
