@@ -10,6 +10,7 @@ export const listChapters = async (req: Request, res: Response) => {
         title: true,
         content: true,
         chapter_number: true,
+        video: true,
       },
     });
     res.status(200).json(chapters);
@@ -46,7 +47,7 @@ export const getChapterByFormation = async (req: Request, res: Response) => {
 };
 
 export const createChapter = async (req: Request, res: Response) => {
-  const { formation_id, title, content, chapter_number } = req.body;
+  const { formation_id, title, content, chapter_number, video } = req.body;
   try {
     let chapter = await db.chapters.create({
       data: {
@@ -54,6 +55,7 @@ export const createChapter = async (req: Request, res: Response) => {
         title,
         content,
         chapter_number,
+        video,
       },
     });
     res.status(201).json({ message: "chapter created: ", chapter });
@@ -65,7 +67,7 @@ export const createChapter = async (req: Request, res: Response) => {
 
 export const updateChapter = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
-  const { formation_id, title, content, chapter_number } = req.body;
+  const { formation_id, title, content, chapter_number, video } = req.body;
 
   try {
     await db.chapters.update({
@@ -75,6 +77,7 @@ export const updateChapter = async (req: Request, res: Response) => {
         title,
         content,
         chapter_number,
+        video,
       },
     });
 

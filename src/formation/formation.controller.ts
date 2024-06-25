@@ -13,12 +13,12 @@ export const listFormations = async (req: Request, res: Response) => {
         author_id: true,
         title: true,
         description: true,
-        video: true,
         category_id: true,
         difficulty: true,
         completionTime: true,
         qualityRating: true,
         coverImage: true,
+        isPro: true,
       },
     });
     res.status(200).json(formations);
@@ -87,7 +87,6 @@ export const getFormationById = async (req: Request, res: Response) => {
       id,
       title,
       description,
-      video,
       difficulty,
       completionTime,
       qualityRating,
@@ -101,7 +100,6 @@ export const getFormationById = async (req: Request, res: Response) => {
       id,
       title,
       description,
-      video,
       difficulty,
       completionTime,
       qualityRating,
@@ -160,7 +158,6 @@ export const getFormationByTitle = async (req: Request, res: Response) => {
         author_id: true,
         title: true,
         description: true,
-        video: true,
         category_id: true,
         difficulty: true,
         completionTime: true,
@@ -210,7 +207,6 @@ export const createFormation = async (req: Request, res: Response) => {
       data: {
         title,
         description,
-        video,
         difficulty,
         completionTime,
         qualityRating,
@@ -250,7 +246,6 @@ export const updateFormation = async (req: Request, res: Response) => {
       data: {
         title,
         description,
-        video,
         difficulty,
         completionTime,
         qualityRating,

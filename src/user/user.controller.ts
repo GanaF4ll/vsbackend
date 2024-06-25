@@ -37,10 +37,15 @@ export const getUserById = async (req: Request, res: Response) => {
         id: parseInt(req.params.id),
       },
     });
+
+    if (user === null) {
+      return res.status(404).json({ message: "No user found with that id" });
+    }
+    // console.log(user);
     res.status(200).json(user);
   } catch (error: any) {
     console.error(error);
-    res.status(404).json({ message: "No user found with that id" });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -55,6 +60,10 @@ export const getUserByName = async (req: Request, res: Response) => {
         ],
       },
     });
+
+    if (user.length === 0) {
+      return res.status(404).json({ message: "No user found with that name" });
+    }
     res.status(200).json(user);
   } catch (error: any) {
     console.error(error);
@@ -94,7 +103,7 @@ export const signup = async (req: Request, res: Response) => {
 
   let user = await db.users.findFirst({ where: { mail } });
   if (user) {
-    res.status(400).json({ message: "ERROR: User already exists !" });
+    return res.status(400).json({ message: "ERROR: User already exists !" });
   }
 
   const passwordRegex =
@@ -123,7 +132,7 @@ export const signup = async (req: Request, res: Response) => {
     },
   });
 
-  res.status(201).json(user);
+  return res.status(201).json(user);
 };
 
 export const login = async (req: Request, res: Response) => {
@@ -135,6 +144,7 @@ export const login = async (req: Request, res: Response) => {
   }
 
   const isPasswordMatch = await bcrypt.compare(password, user.password);
+  console.log("isPasswordMatch: ", isPasswordMatch);
 
   if (!isPasswordMatch) {
     return res.status(401).json({ message: "Invalid password" });
@@ -145,6 +155,7 @@ export const login = async (req: Request, res: Response) => {
     process.env.TOKEN_SECRET as string,
     { noTimestamp: true }
   );
+  console.log("Generated token: ", token);
 
   res.status(200).json({ token });
 };

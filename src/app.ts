@@ -14,7 +14,7 @@ import { answerRouter } from "./answer/answer.router";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 let db: PrismaClient;
 
 declare global {
@@ -30,7 +30,7 @@ export { db };
 
 app.use(cors());
 app.use(express.json());
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || process.env.TEST_PORT;
 
 app.use(cors());
 
@@ -61,6 +61,6 @@ app.use("/chapters", chapterRouter);
 app.use("/questions", questionRouter);
 app.use("/answers", answerRouter);
 
-app.listen(PORT, () => {
+export const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
