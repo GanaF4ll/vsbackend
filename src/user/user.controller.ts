@@ -144,7 +144,6 @@ export const login = async (req: Request, res: Response) => {
   }
 
   const isPasswordMatch = await bcrypt.compare(password, user.password);
-  console.log("isPasswordMatch: ", isPasswordMatch);
 
   if (!isPasswordMatch) {
     return res.status(401).json({ message: "Invalid password" });
@@ -155,7 +154,7 @@ export const login = async (req: Request, res: Response) => {
     process.env.TOKEN_SECRET as string,
     { noTimestamp: true }
   );
-  console.log("Generated token: ", token);
+  // console.log("Generated token: ", token);
 
   res.status(200).json({ token });
 };

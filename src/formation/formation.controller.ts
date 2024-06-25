@@ -191,18 +191,6 @@ export const createFormation = async (req: Request, res: Response) => {
       coverImage,
     } = req.body;
 
-    let imageUrl: string = "";
-
-    if (category_id === 1) {
-      imageUrl = "../../assets/images/formation/mock1.jpg";
-    } else if (category_id === 2) {
-      imageUrl = "../../assets/images/formation/mock2.png";
-    } else if (category_id === 3) {
-      imageUrl = "../../assets/images/formation/mock3.jpg";
-    } else if (category_id === 4) {
-      imageUrl = "../../assets/images/formation/mock4.jpg";
-    }
-
     let formation = await db.formations.create({
       data: {
         title,
@@ -210,7 +198,7 @@ export const createFormation = async (req: Request, res: Response) => {
         difficulty,
         completionTime,
         qualityRating,
-        coverImage: imageUrl,
+        coverImage,
         author: { connect: { id: author_id } },
         category: { connect: { id: category_id } },
       },

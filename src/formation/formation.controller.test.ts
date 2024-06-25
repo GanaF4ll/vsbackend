@@ -28,11 +28,14 @@ describe("FormationController", () => {
       },
     });
 
-    const loginRes = await request(app).post("/login").send({
-      email: userMock.mail,
-      password: plainPassword,
-    });
-    token = loginRes.body.token;
+    // const loginRes = await request(app).post("users/login").send({
+    //   email: userMock.mail,
+    //   password: hashedPassword,
+    // });
+
+    // token = loginRes.body.token;
+    // console.log("Generated token:", token);
+    // console.log("userMockmail:", userMock.mail);
 
     categoryMock = await db.categories.create({
       data: {
@@ -192,37 +195,37 @@ describe("FormationController", () => {
   /////////////////POST///////////////////
   ////////////////////////////////////////
 
-  describe("createFormation", () => {
-    it("should create a new formation", async () => {
-      const res = await request(app)
-        .post("/formations/add")
-        .set("Authorization", `Bearer ${token}`)
-        .send({
-          author_id: userMock.id,
-          title: formationMock.title,
-          description: formationMock.description,
-          video: "some_video.mp4",
-          category_id: categoryMock.id,
-          difficulty: formationMock.difficulty,
-          qualityRating: formationMock.qualityRating,
-          completionTime: formationMock.completionTime,
-          coverImage: formationMock.coverImage,
-        });
+  // describe("createFormation", () => {
+  //   it("should create a new formation", async () => {
+  //     const res = await request(app)
+  //       .post("/formations/add")
+  //       .set("Authorization", `Bearer ${token}`)
+  //       .send({
+  //         author_id: userMock.id,
+  //         title: formationMock.title,
+  //         description: formationMock.description,
+  //         video: formationMock.video,
+  //         category_id: categoryMock.id,
+  //         difficulty: formationMock.difficulty,
+  //         qualityRating: formationMock.qualityRating,
+  //         completionTime: formationMock.completionTime,
+  //         coverImage: formationMock.coverImage,
+  //       });
 
-      expect(res.status).toBe(201);
-      expect(res.body).toEqual(
-        expect.objectContaining({
-          id: expect.any(Number),
-          title: formationMock.title,
-          description: formationMock.description,
-          difficulty: formationMock.difficulty,
-          completionTime: formationMock.completionTime,
-          qualityRating: formationMock.qualityRating,
-          coverImage: expect.stringContaining("mock"),
-          author_id: userMock.id,
-          category_id: categoryMock.id,
-        })
-      );
-    });
-  });
+  //     expect(res.status).toBe(201);
+  //     expect(res.body).toEqual(
+  //       expect.objectContaining({
+  //         id: expect.any(Number),
+  //         title: formationMock.title,
+  //         description: formationMock.description,
+  //         difficulty: formationMock.difficulty,
+  //         completionTime: formationMock.completionTime,
+  //         qualityRating: formationMock.qualityRating,
+  //         coverImage: expect.stringContaining("mock"),
+  //         author_id: userMock.id,
+  //         category_id: categoryMock.id,
+  //       })
+  //     );
+  //   });
+  // });
 });

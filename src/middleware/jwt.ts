@@ -93,10 +93,12 @@ export const creatorToken = (
   res: Response,
   next: NextFunction
 ) => {
-  let token = req.headers["authorization"] as string;
+  let authHeader = req.headers["authorization"];
+  if (!authHeader) {
+    return res.status(403).send({ message: "Aucun token fourni!" });
+  }
 
-  // console.log("Token:", token);
-
+  let token = authHeader.split(" ")[1];
   if (!token) {
     return res.status(403).send({ message: "Aucun token fourni!" });
   }
@@ -112,10 +114,6 @@ export const creatorToken = (
 
       const userIdToken = decoded.id;
       const userRole_idToken = decoded.role;
-
-      // console.log("Decoded id:", userIdToken);
-      // console.log(decoded.token);
-      // console.log("Decoded role:", userRole_idToken);
 
       const user = await db.users.findUnique({
         where: { id: userIdToken },
