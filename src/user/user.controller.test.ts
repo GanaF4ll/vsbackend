@@ -217,31 +217,31 @@ describe("UserController", () => {
   });
 
   describe("login", () => {
-    // it("should log in successfully with correct credentials", async () => {
-    //   const response = await request(app).post("/users/login").send({
-    //     mail: "test.user@example.com",
-    //     password: "Password?24",
-    //   });
+    it("should log in successfully with correct credentials", async () => {
+      const response = await request(app).post("/users/login").send({
+        mail: "test.user@example.com",
+        password: "Password?24",
+      });
 
-    //   console.log("Response: ", response.body);
+      console.log("Response: ", response.body);
 
-    //   expect(response.status).toBe(200);
-    //   expect(response.body).toHaveProperty("token");
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("token");
 
-    //   const decodedToken = jwt.verify(
-    //     response.body.token,
-    //     process.env.TOKEN_SECRET as string
-    //   );
-    //   console.log("Decoded token: ", decodedToken);
+      const decodedToken = jwt.verify(
+        response.body.token,
+        process.env.TOKEN_SECRET as string
+      );
+      console.log("Decoded token: ", decodedToken);
 
-    //   expect(decodedToken).toEqual(
-    //     expect.objectContaining({
-    //       id: userMock.id,
-    //       mail: userMock.mail,
-    //       role: userMock.role_id,
-    //     })
-    //   );
-    // });
+      expect(decodedToken).toEqual(
+        expect.objectContaining({
+          id: userMock.id,
+          mail: userMock.mail,
+          role: userMock.role_id,
+        })
+      );
+    });
 
     it("should return 404 if user is not found", async () => {
       const response = await request(app).post("/users/login").send({

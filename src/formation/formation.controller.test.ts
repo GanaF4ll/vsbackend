@@ -186,6 +186,8 @@ describe("FormationController", () => {
             completionTime: formationMock.completionTime,
             qualityRating: formationMock.qualityRating,
             coverImage: formationMock.coverImage,
+            author_id: userMock.id,
+            category_id: categoryMock.id,
           },
         ])
       );
