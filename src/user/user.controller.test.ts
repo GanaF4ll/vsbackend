@@ -73,12 +73,12 @@ describe("UserController", () => {
       expect(response.body).toEqual(
         expect.objectContaining({
           id: userMock.id,
-          firstName: "Test",
-          lastName: "User",
+          firstName: userMock.firstName,
+          lastName: userMock.lastName,
           birthdate: userMock.birthdate.toISOString(),
-          mail: "test.user@example.com",
-          role_id: 1,
-          gender: "male",
+          mail: userMock.mail,
+          role_id: userMock.role_id,
+          gender: userMock.gender,
         })
       );
     });
