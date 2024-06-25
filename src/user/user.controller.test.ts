@@ -18,8 +18,6 @@ describe("UserController", () => {
   beforeEach(async () => {
     const plainPassword = "Password?24";
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
-    // console.log("Plain password: ", plainPassword);
-    // console.log("Hashed password: ", hashedPassword);
 
     userMock = await db.users.create({
       data: {
@@ -48,9 +46,9 @@ describe("UserController", () => {
 
   describe("listUsers", () => {
     it("should return a list of users", async () => {
-      const response = await request(app).get("/users/all");
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual(
+      const res = await request(app).get("/users/all");
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
             id: expect.any(Number),
@@ -68,9 +66,9 @@ describe("UserController", () => {
 
   describe("getUserById", () => {
     it("should return a user by ID", async () => {
-      const response = await request(app).get(`/users/${userMock.id}`);
-      expect(response.status).toBe(200);
-      expect(response.body).toEqual(
+      const res = await request(app).get(`/users/${userMock.id}`);
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual(
         expect.objectContaining({
           id: userMock.id,
           firstName: userMock.firstName,
@@ -84,26 +82,24 @@ describe("UserController", () => {
     });
 
     it("should return 404 if user not found", async () => {
-      const response = await request(app).get("/users/9999");
-      expect(response.status).toBe(404);
-      expect(response.body).toEqual({ message: "No user found with that id" });
+      const res = await request(app).get("/users/9999");
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({ message: "No user found with that id" });
     });
   });
 
   describe("getUserByName", () => {
     it("should return a list of users filtered by their name", async () => {
-      const response = await request(app).get(
-        `/users/name/${userMock.firstName}`
-      );
-      expect(response.status).toBe(200);
-      const userIdsInResponse = response.body.map((user: any) => user.id);
-      expect(userIdsInResponse).toContain(userMock.id);
+      const res = await request(app).get(`/users/name/${userMock.firstName}`);
+      expect(res.status).toBe(200);
+      const userIdsInres = res.body.map((user: any) => user.id);
+      expect(userIdsInres).toContain(userMock.id);
     });
 
     it("should return 404 if user not found", async () => {
-      const response = await request(app).get("/users/name/zzz");
-      expect(response.status).toBe(404);
-      expect(response.body).toEqual({
+      const res = await request(app).get("/users/name/zzz");
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({
         message: "No user found with that name",
       });
     });
@@ -111,20 +107,20 @@ describe("UserController", () => {
 
   describe("getUserByMail", () => {
     it("should return a user by mail", async () => {
-      const response = await request(app).get(`/users/mail/${userMock.mail}`);
-      expect(response.status).toBe(200);
-      expect(response.body.firstName).toBe(userMock.firstName);
-      expect(response.body.lastName).toBe(userMock.lastName);
-      expect(new Date(response.body.birthdate)).toEqual(userMock.birthdate);
-      expect(response.body.mail).toBe(userMock.mail);
-      expect(response.body.role_id).toBe(userMock.role_id);
-      expect(response.body.gender).toBe(userMock.gender);
+      const res = await request(app).get(`/users/mail/${userMock.mail}`);
+      expect(res.status).toBe(200);
+      expect(res.body.firstName).toBe(userMock.firstName);
+      expect(res.body.lastName).toBe(userMock.lastName);
+      expect(new Date(res.body.birthdate)).toEqual(userMock.birthdate);
+      expect(res.body.mail).toBe(userMock.mail);
+      expect(res.body.role_id).toBe(userMock.role_id);
+      expect(res.body.gender).toBe(userMock.gender);
     });
 
     it("should return 404 if user not found", async () => {
-      const response = await request(app).get("/users/mail/test");
-      expect(response.status).toBe(404);
-      expect(response.body).toEqual({
+      const res = await request(app).get("/users/mail/test");
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({
         message: "No user found with that email",
       });
     });
@@ -135,7 +131,7 @@ describe("UserController", () => {
   ////////////////////////////////////////
   describe("signup", () => {
     it("should create a new user successfully", async () => {
-      const response = await request(app).post("/users/signup").send({
+      const res = await request(app).post("/users/signup").send({
         firstName: "John",
         lastName: "Doe",
         mail: "john.doe@example.com",
@@ -145,8 +141,8 @@ describe("UserController", () => {
         birthdate: "1990-01-01",
       });
 
-      expect(response.status).toBe(201);
-      expect(response.body).toEqual(
+      expect(res.status).toBe(201);
+      expect(res.body).toEqual(
         expect.objectContaining({
           id: expect.any(Number),
           firstName: "John",
@@ -160,7 +156,7 @@ describe("UserController", () => {
 
       // Clean up
       await db.users.delete({
-        where: { id: response.body.id },
+        where: { id: res.body.id },
       });
     });
 
@@ -169,7 +165,7 @@ describe("UserController", () => {
         data: {
           firstName: "Existing",
           lastName: "User",
-          mail: "existing.user@example.com", // Utilisez un email qui existe déjà
+          mail: "existing.user@example.com",
           password: await bcrypt.hash("Password?24", 10),
           role_id: 1,
           gender: "male",
@@ -177,18 +173,18 @@ describe("UserController", () => {
         },
       });
 
-      const response = await request(app).post("/users/signup").send({
+      const res = await request(app).post("/users/signup").send({
         firstName: "Jane",
         lastName: "Doe",
-        mail: "existing.user@example.com", // Utilisez le même email
+        mail: "existing.user@example.com",
         password: "Password?24",
         role_id: 1,
         gender: "female",
         birthdate: "1990-01-01",
       });
 
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual({
+      expect(res.status).toBe(400);
+      expect(res.body).toEqual({
         message: "ERROR: User already exists !",
       });
 
@@ -199,7 +195,7 @@ describe("UserController", () => {
     });
 
     it("should return an error if the password is not strong enough", async () => {
-      const response = await request(app).post("/users/signup").send({
+      const res = await request(app).post("/users/signup").send({
         firstName: "John",
         lastName: "Weak",
         mail: "john.weakpass@example.com",
@@ -209,8 +205,8 @@ describe("UserController", () => {
         birthdate: "1990-01-01",
       });
 
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual({
+      expect(res.status).toBe(400);
+      expect(res.body).toEqual({
         message: "ERROR: Password is not strong enough!",
       });
     });
@@ -218,21 +214,18 @@ describe("UserController", () => {
 
   describe("login", () => {
     it("should log in successfully with correct credentials", async () => {
-      const response = await request(app).post("/users/login").send({
+      const res = await request(app).post("/users/login").send({
         mail: "test.user@example.com",
         password: "Password?24",
       });
 
-      console.log("Response: ", response.body);
-
-      expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("token");
+      expect(res.status).toBe(200);
+      expect(res.body).toHaveProperty("token");
 
       const decodedToken = jwt.verify(
-        response.body.token,
+        res.body.token,
         process.env.TOKEN_SECRET as string
       );
-      console.log("Decoded token: ", decodedToken);
 
       expect(decodedToken).toEqual(
         expect.objectContaining({
@@ -244,23 +237,23 @@ describe("UserController", () => {
     });
 
     it("should return 404 if user is not found", async () => {
-      const response = await request(app).post("/users/login").send({
+      const res = await request(app).post("/users/login").send({
         mail: "nonexistent@example.com",
         password: "Password?24",
       });
 
-      expect(response.status).toBe(404);
-      expect(response.body).toEqual({ message: "User not found" });
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({ message: "User not found" });
     });
 
     it("should return 401 if the password is incorrect", async () => {
-      const response = await request(app).post("/users/login").send({
+      const res = await request(app).post("/users/login").send({
         mail: "test.user@example.com",
         password: "WrongPassword",
       });
 
-      expect(response.status).toBe(401);
-      expect(response.body).toEqual({ message: "Invalid password" });
+      expect(res.status).toBe(401);
+      expect(res.body).toEqual({ message: "Invalid password" });
     });
   });
 });

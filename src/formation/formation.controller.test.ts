@@ -110,6 +110,10 @@ describe("FormationController", () => {
     });
   });
 
+  ////////////////////////////////////////
+  /////////////////GET////////////////////
+  ////////////////////////////////////////
+
   describe("listFormations", () => {
     it("should return a list of formations", async () => {
       const res = await request(app).get("/formations/all");
