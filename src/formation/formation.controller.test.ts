@@ -1,6 +1,7 @@
 import request from "supertest";
 import { app, db, server } from "../app";
 import bcrypt from "bcrypt";
+import exp from "constants";
 
 describe("FormationController", () => {
   let formationMock: any;
@@ -15,12 +16,6 @@ describe("FormationController", () => {
   });
 
   afterAll(async () => {
-    await db.answers.deleteMany();
-    await db.questions.deleteMany();
-    await db.chapters.deleteMany();
-    await db.formations.deleteMany();
-    await db.categories.deleteMany();
-    await db.users.deleteMany();
     await db.$disconnect();
     server.close();
   });
@@ -92,9 +87,15 @@ describe("FormationController", () => {
 
   afterEach(async () => {
     if (formationMock) {
-      await db.answers.deleteMany();
-      await db.questions.deleteMany();
-      await db.chapters.deleteMany();
+      await db.answers.deleteMany({
+        where: { id: answerMock.id },
+      });
+      await db.questions.deleteMany({
+        where: { id: questionMock.id },
+      });
+      await db.chapters.deleteMany({
+        where: { id: chapterMock.id },
+      });
       await db.formations.delete({
         where: { id: formationMock.id },
       });
@@ -166,6 +167,28 @@ describe("FormationController", () => {
           }),
         ]),
       });
+    });
+  });
+
+  describe("getFormationByTitle", () => {
+    it("should return a formation by its title", async () => {
+      const res = await request(app).get(
+        `/formations/title/${encodeURIComponent(formationMock.title)}`
+      );
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual(
+        expect.arrayContaining([
+          {
+            id: formationMock.id,
+            title: formationMock.title,
+            description: formationMock.description,
+            difficulty: formationMock.difficulty,
+            completionTime: formationMock.completionTime,
+            qualityRating: formationMock.qualityRating,
+            coverImage: formationMock.coverImage,
+          },
+        ])
+      );
     });
   });
 });
