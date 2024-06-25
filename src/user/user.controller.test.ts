@@ -1,6 +1,5 @@
 import request from "supertest";
-import { app } from "../app";
-import { db } from "../app";
+import { app, server, db } from "../app";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -13,6 +12,7 @@ describe("UserController", () => {
 
   afterAll(async () => {
     await db.$disconnect();
+    server.close();
   });
 
   beforeEach(async () => {

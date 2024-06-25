@@ -1,7 +1,6 @@
 import request from "supertest";
-import { app } from "../app";
-import { db } from "../app";
-import { after } from "node:test";
+import { app, server, db } from "../app";
+// import { after } from "node:test";
 
 describe("FormationController", () => {
   let formationMock: any;
@@ -12,6 +11,7 @@ describe("FormationController", () => {
 
   afterAll(async () => {
     await db.$disconnect();
+    server.close();
   });
 
   beforeEach(async () => {
@@ -46,15 +46,15 @@ describe("FormationController", () => {
         expect.arrayContaining([
           expect.objectContaining({
             id: expect.any(Number),
+            author_id: expect.any(Number),
             title: expect.any(String),
             description: expect.any(String),
-            completionTime: expect.any(Number),
-            difficulty: expect.any(String),
-            coverImage: expect.any(String),
-            qualityRating: expect.any(Number),
             video: expect.any(String),
-            author_id: expect.any(Number),
             category_id: expect.any(Number),
+            difficulty: expect.any(String),
+            completionTime: expect.any(Number),
+            qualityRating: expect.any(Number),
+            coverImage: expect.any(String),
           }),
         ])
       );
