@@ -34,8 +34,12 @@ model Articles {
 }
 
 model Categories {
-  id         Int          @id @default(autoincrement())
-  name       String       @db.VarChar(50)
+  id              Int          @id @default(autoincrement())
+  name            String       @db.VarChar(50)
+  shortName       String       @db.VarChar(50)
+  description     String       @db.VarChar(50)
+  backgroundImage String     @db.VarChar(50)
+
   articles   Articles[]
   formations Formations[]
 }
@@ -46,6 +50,8 @@ model Chapters {
   title          String         @db.VarChar(50)
   content        String         @db.Text
   chapter_number Int
+  video          String     @db.VarChar(50)
+
   formation      Formations     @relation(fields: [formation_id], references: [id])
   progression    Progressions[]
   questions      Questions[]
@@ -58,12 +64,12 @@ model Formations {
   author_id      Int
   title          String     @db.VarChar(50)
   description    String     @db.Text
-  video          String     @db.VarChar(50)
   category_id    Int
   difficulty     String     @db.VarChar(10)
   completionTime Int
   qualityRating  Int
   coverImage     String     @db.VarChar(50)
+  isPro          Boolean    @default(false)
   createdAt      DateTime   @default(now())
   modifiedAt     DateTime   @default(now())
   chapters       Chapters[]

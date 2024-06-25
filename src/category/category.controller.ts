@@ -7,6 +7,9 @@ export const listCategories = async (req: Request, res: Response) => {
       select: {
         id: true,
         name: true,
+        shortName: true,
+        description: true,
+        backgroundImage: true,
       },
     });
     res.status(200).json(categories);
@@ -33,12 +36,15 @@ export const getCategoryById = async (req: Request, res: Response) => {
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const { name, shortName, description, backgroundImage } = req.body;
     let category = await db.categories.findFirst({ where: { name } });
 
     category = await db.categories.create({
       data: {
         name,
+        shortName,
+        description,
+        backgroundImage,
       },
     });
     res.status(201).json(category);
@@ -51,13 +57,16 @@ export const createCategory = async (req: Request, res: Response) => {
 export const updateCategory = async (req: Request, res: Response) => {
   const id = parseInt(req.params.id);
   try {
-    const { name } = req.body;
+    const { name, shortName, description, backgroundImage } = req.body;
     await db.categories.update({
       where: {
         id,
       },
       data: {
         name,
+        shortName,
+        description,
+        backgroundImage,
       },
     });
 
@@ -68,6 +77,9 @@ export const updateCategory = async (req: Request, res: Response) => {
       select: {
         id: true,
         name: true,
+        shortName: true,
+        description: true,
+        backgroundImage: true,
       },
     });
 

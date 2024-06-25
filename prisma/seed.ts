@@ -1,4 +1,4 @@
-import { db } from "../src/db/db.server";
+import { db } from "../src/app";
 
 type User = {
   firstName: string;
@@ -33,7 +33,7 @@ function getUsers(): Array<User> {
 async function seedUsers() {
   const users = getUsers();
   for (const user of users) {
-    await db.user.create({
+    await db.users.create({
       data: {
         firstName: user.firstName,
         lastName: user.lastName,

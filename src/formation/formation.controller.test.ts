@@ -44,6 +44,9 @@ describe("FormationController", () => {
     categoryMock = await db.categories.create({
       data: {
         name: "Jujutsu sorcery",
+        shortName: "Jujutsu",
+        description: "This is a test category",
+        backgroundImage: "jujutsu.jpg",
       },
     });
 
@@ -55,9 +58,9 @@ describe("FormationController", () => {
         difficulty: "hard",
         coverImage: "formation1.jpg",
         qualityRating: 5,
-        video: "video.mp4",
         author_id: userMock.id,
         category_id: categoryMock.id,
+        isPro: false,
       },
     });
 
@@ -67,6 +70,7 @@ describe("FormationController", () => {
         title: "Simple domain",
         content: "Définition, importance, histoire et évolution",
         chapter_number: 1,
+        video: "domain.mp4",
       },
     });
 
@@ -116,12 +120,12 @@ describe("FormationController", () => {
             author_id: expect.any(Number),
             title: expect.any(String),
             description: expect.any(String),
-            video: expect.any(String),
             category_id: expect.any(Number),
             difficulty: expect.any(String),
             completionTime: expect.any(Number),
             qualityRating: expect.any(Number),
             coverImage: expect.any(String),
+            isPro: expect.any(Boolean),
           }),
         ])
       );
@@ -132,39 +136,36 @@ describe("FormationController", () => {
     it("should return a formation with its chapters, questions, and answers by id", async () => {
       const res = await request(app).get(`/formations/${formationMock.id}`);
       expect(res.status).toBe(200);
-      expect(res.body).toEqual(
-        expect.objectContaining({
-          id: formationMock.id,
-          title: formationMock.title,
-          description: formationMock.description,
-          video: formationMock.video,
-          difficulty: formationMock.difficulty,
-          completionTime: formationMock.completionTime,
-          qualityRating: formationMock.qualityRating,
-          coverImage: formationMock.coverImage,
-          author: `${userMock.firstName} ${userMock.lastName}`,
-          category: categoryMock.name,
-          chapters: expect.arrayContaining([
-            expect.objectContaining({
-              id: chapterMock.id,
-              title: chapterMock.title,
-              questions: expect.arrayContaining([
-                expect.objectContaining({
-                  id: questionMock.id,
-                  content: questionMock.content,
-                  answers: expect.arrayContaining([
-                    expect.objectContaining({
-                      id: answerMock.id,
-                      content: answerMock.content,
-                      valid: answerMock.valid,
-                    }),
-                  ]),
-                }),
-              ]),
-            }),
-          ]),
-        })
-      );
+      expect(res.body).toEqual({
+        id: formationMock.id,
+        title: formationMock.title,
+        description: formationMock.description,
+        difficulty: formationMock.difficulty,
+        completionTime: formationMock.completionTime,
+        qualityRating: formationMock.qualityRating,
+        coverImage: formationMock.coverImage,
+        author: `${userMock.firstName} ${userMock.lastName}`,
+        category: categoryMock.name,
+        chapters: expect.arrayContaining([
+          expect.objectContaining({
+            id: chapterMock.id,
+            title: chapterMock.title,
+            questions: expect.arrayContaining([
+              expect.objectContaining({
+                id: questionMock.id,
+                content: questionMock.content,
+                answers: expect.arrayContaining([
+                  expect.objectContaining({
+                    id: answerMock.id,
+                    content: answerMock.content,
+                    valid: answerMock.valid,
+                  }),
+                ]),
+              }),
+            ]),
+          }),
+        ]),
+      });
     });
   });
 });
