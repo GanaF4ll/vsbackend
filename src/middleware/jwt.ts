@@ -8,7 +8,7 @@ export const userToken = (req: Request, res: Response, next: NextFunction) => {
 
   let token = req.headers["authorization"] as string;
 
-  console.log("Token:", token);
+  // console.log("Token:", token);
 
   if (!token) {
     return res.status(403).send({ message: "Aucun token fourni!" });
@@ -95,7 +95,7 @@ export const creatorToken = (
 ) => {
   let token = req.headers["authorization"] as string;
 
-  console.log("Token:", token);
+  // console.log("Token:", token);
 
   if (!token) {
     return res.status(403).send({ message: "Aucun token fourni!" });
