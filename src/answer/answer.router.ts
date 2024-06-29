@@ -18,7 +18,7 @@ answerRouter.get(
 
 answerRouter.post(
   "/add",
-  creatorToken,
+  // creatorToken,
   answerController.createAnswer.bind(answerController)
 );
 
