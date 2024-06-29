@@ -50,6 +50,16 @@ class AnswerController {
   public async createAnswer(req: Request, res: Response) {
     try {
       const { content, question_id, valid } = req.body;
+
+      // Vérifier si la question existe
+      const question = await db.questions.findUnique({
+        where: { id: question_id },
+      });
+
+      if (!question) {
+        return res.status(404).json({ message: "Question not found" });
+      }
+
       const answer = await db.answers.create({
         data: {
           content,
@@ -57,6 +67,7 @@ class AnswerController {
           question: { connect: { id: question_id } },
         },
       });
+
       res.status(201).json(answer);
     } catch (error: any) {
       console.error(error);
