@@ -1,23 +1,35 @@
-import * as AnswerController from "./answer.controller";
 import { Router } from "express";
+import { answerController } from "./answer.controller";
 import { creatorToken } from "../middleware/jwt";
 
 export const answerRouter = Router();
 
-answerRouter.get("/all", AnswerController.listAnswers);
+answerRouter.get("/all", answerController.listAnswers.bind(answerController));
 
 answerRouter.get(
   "/question/:question_id",
-  AnswerController.getAnswersByQuestion
+  answerController.getAnswersByQuestion.bind(answerController)
 );
 
 answerRouter.get(
   "/question/valid/:question_id",
-  AnswerController.getValidAnswersByQuestion
+  answerController.getValidAnswersByQuestion.bind(answerController)
 );
 
-answerRouter.post("/add", creatorToken, AnswerController.createAnswer);
+answerRouter.post(
+  "/add",
+  creatorToken,
+  answerController.createAnswer.bind(answerController)
+);
 
-answerRouter.put("/:id", creatorToken, AnswerController.updateAnswer);
+answerRouter.put(
+  "/:id",
+  creatorToken,
+  answerController.updateAnswer.bind(answerController)
+);
 
-answerRouter.delete("/:id", creatorToken, AnswerController.deleteAnswer);
+answerRouter.delete(
+  "/:id",
+  creatorToken,
+  answerController.deleteAnswer.bind(answerController)
+);

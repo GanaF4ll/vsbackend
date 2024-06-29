@@ -183,7 +183,6 @@ export const createFormation = async (req: Request, res: Response) => {
       author_id,
       title,
       description,
-      video,
       category_id,
       difficulty,
       qualityRating,
