@@ -60,7 +60,9 @@ class AnswerController {
       res.status(201).json(answer);
     } catch (error: any) {
       console.error(error);
-      res.status(500).json({ message: "Answer not created" });
+      res
+        .status(500)
+        .json({ message: "Answer not created", error: error.message });
     }
   }
 
