@@ -137,24 +137,27 @@ export const signup = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   const { mail, password } = req.body;
+  // checks if the user exists
   let user = await db.users.findFirst({ where: { mail } });
 
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
 
+  // bcrypt.compare returns a promise
   const isPasswordMatch = await bcrypt.compare(password, user.password);
 
   if (!isPasswordMatch) {
-    return res.status(401).json({ message: "Invalid password" });
+    return res.status(401).json({ message: "Invalid mail or password " });
   }
 
   const token = jwt.sign(
+    // informations to be encoded in the token
     { id: user.id, mail: user.mail, role: user.role_id },
     process.env.TOKEN_SECRET as string,
+    // ensures that the token does not expire
     { noTimestamp: true }
   );
-  // console.log("Generated token: ", token);
 
   res.status(200).json({ token });
 };

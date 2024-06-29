@@ -135,3 +135,9 @@ model Users {
 
   @@index([role_id], map: "Users_role_id_fkey")
 }
+
+
+generator erd {
+  provider = "prisma-erd-generator"
+  includeRelationFromFields = true
+}
