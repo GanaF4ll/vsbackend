@@ -8,7 +8,7 @@ export const userToken = (req: Request, res: Response, next: NextFunction) => {
 
   let token = req.headers["authorization"] as string;
 
-  console.log("Token:", token);
+  // console.log("Token:", token);
 
   if (!token) {
     return res.status(403).send({ message: "Aucun token fourni!" });
@@ -49,14 +49,14 @@ export const userToken = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const adminToken = (req: Request, res: Response, next: NextFunction) => {
+  // verify if the token is present
   let token = req.headers["authorization"] as string;
-
-  console.log("Token:", token);
 
   if (!token) {
     return res.status(403).send({ message: "Aucun token fourni!" });
   }
 
+  // verify the token + the TOKEN_SECRET
   jwt.verify(
     token,
     process.env.TOKEN_SECRET as string,
@@ -65,14 +65,10 @@ export const adminToken = (req: Request, res: Response, next: NextFunction) => {
         console.log("JWT verification error:", err);
         return res.status(401).send({ message: "Non autorisé!" });
       }
-
+      // retrieves the user id and role from the token
       const userIdToken = decoded.id;
       const userRole_idToken = decoded.role;
-
-      // console.log("Decoded id:", userIdToken);
-      // console.log(decoded.token);
-      // console.log("Decoded role:", userRole_idToken);
-
+      // checks if the user is an admin
       const user = await db.users.findUnique({
         where: { id: userIdToken },
         select: { role_id: true },
@@ -93,10 +89,12 @@ export const creatorToken = (
   res: Response,
   next: NextFunction
 ) => {
-  let token = req.headers["authorization"] as string;
+  let authHeader = req.headers["authorization"];
+  if (!authHeader) {
+    return res.status(403).send({ message: "Aucun token fourni!" });
+  }
 
-  console.log("Token:", token);
-
+  let token = authHeader.split(" ")[1];
   if (!token) {
     return res.status(403).send({ message: "Aucun token fourni!" });
   }
@@ -112,10 +110,6 @@ export const creatorToken = (
 
       const userIdToken = decoded.id;
       const userRole_idToken = decoded.role;
-
-      // console.log("Decoded id:", userIdToken);
-      // console.log(decoded.token);
-      // console.log("Decoded role:", userRole_idToken);
 
       const user = await db.users.findUnique({
         where: { id: userIdToken },

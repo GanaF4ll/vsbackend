@@ -37,7 +37,7 @@ model Categories {
   id              Int          @id @default(autoincrement())
   name            String       @db.VarChar(50)
   shortName       String       @db.VarChar(50)
-  description     String       @db.VarChar(50)
+  description     String       @db.VarChar(250)
   backgroundImage String     @db.VarChar(50)
 
   articles   Articles[]
@@ -134,4 +134,10 @@ model Users {
   role         Roles         @relation(fields: [role_id], references: [id])
 
   @@index([role_id], map: "Users_role_id_fkey")
+}
+
+
+generator erd {
+  provider = "prisma-erd-generator"
+  includeRelationFromFields = true
 }

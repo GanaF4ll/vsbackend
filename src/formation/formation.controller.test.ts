@@ -1,7 +1,6 @@
 import request from "supertest";
 import { app, db, server } from "../app";
 import bcrypt from "bcrypt";
-import exp from "constants";
 
 describe("FormationController", () => {
   let formationMock: any;
@@ -10,17 +9,10 @@ describe("FormationController", () => {
   let chapterMock: any;
   let questionMock: any;
   let answerMock: any;
+  let token: string;
 
   beforeAll(async () => {
     await db.$connect();
-  });
-
-  afterAll(async () => {
-    await db.$disconnect();
-    server.close();
-  });
-
-  beforeEach(async () => {
     const plainPassword = "Password?24";
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
@@ -35,6 +27,15 @@ describe("FormationController", () => {
         gender: "male",
       },
     });
+
+    // const loginRes = await request(app).post("users/login").send({
+    //   email: userMock.mail,
+    //   password: hashedPassword,
+    // });
+
+    // token = loginRes.body.token;
+    // console.log("Generated token:", token);
+    // console.log("userMockmail:", userMock.mail);
 
     categoryMock = await db.categories.create({
       data: {
@@ -85,30 +86,26 @@ describe("FormationController", () => {
     });
   });
 
-  afterEach(async () => {
+  afterAll(async () => {
     if (formationMock) {
-      await db.answers.deleteMany({
-        where: { id: answerMock.id },
-      });
-      await db.questions.deleteMany({
-        where: { id: questionMock.id },
-      });
+      await db.answers.deleteMany({ where: { question_id: questionMock.id } });
+      await db.questions.deleteMany({ where: { chapter_id: chapterMock.id } });
       await db.chapters.deleteMany({
-        where: { id: chapterMock.id },
+        where: { formation_id: formationMock.id },
       });
-      await db.formations.delete({
-        where: { id: formationMock.id },
-      });
+      await db.formations.delete({ where: { id: formationMock.id } });
     }
 
-    await db.categories.delete({
-      where: { id: categoryMock.id },
-    });
+    await db.categories.delete({ where: { id: categoryMock.id } });
+    await db.users.delete({ where: { id: userMock.id } });
 
-    await db.users.delete({
-      where: { id: userMock.id },
-    });
+    await db.$disconnect();
+    server.close();
   });
+
+  ////////////////////////////////////////
+  /////////////////GET////////////////////
+  ////////////////////////////////////////
 
   describe("listFormations", () => {
     it("should return a list of formations", async () => {
@@ -186,9 +183,49 @@ describe("FormationController", () => {
             completionTime: formationMock.completionTime,
             qualityRating: formationMock.qualityRating,
             coverImage: formationMock.coverImage,
+            author_id: userMock.id,
+            category_id: categoryMock.id,
           },
         ])
       );
     });
   });
+
+  ////////////////////////////////////////
+  /////////////////POST///////////////////
+  ////////////////////////////////////////
+
+  // describe("createFormation", () => {
+  //   it("should create a new formation", async () => {
+  //     const res = await request(app)
+  //       .post("/formations/add")
+  //       .set("Authorization", `Bearer ${token}`)
+  //       .send({
+  //         author_id: userMock.id,
+  //         title: formationMock.title,
+  //         description: formationMock.description,
+  //         video: formationMock.video,
+  //         category_id: categoryMock.id,
+  //         difficulty: formationMock.difficulty,
+  //         qualityRating: formationMock.qualityRating,
+  //         completionTime: formationMock.completionTime,
+  //         coverImage: formationMock.coverImage,
+  //       });
+
+  //     expect(res.status).toBe(201);
+  //     expect(res.body).toEqual(
+  //       expect.objectContaining({
+  //         id: expect.any(Number),
+  //         title: formationMock.title,
+  //         description: formationMock.description,
+  //         difficulty: formationMock.difficulty,
+  //         completionTime: formationMock.completionTime,
+  //         qualityRating: formationMock.qualityRating,
+  //         coverImage: expect.stringContaining("mock"),
+  //         author_id: userMock.id,
+  //         category_id: categoryMock.id,
+  //       })
+  //     );
+  //   });
+  // });
 });
