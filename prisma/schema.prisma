@@ -137,7 +137,7 @@ model Users {
 }
 
 
-generator erd {
-  provider = "prisma-erd-generator"
-  includeRelationFromFields = true
-}
+// generator erd {
+//   provider = "prisma-erd-generator"
+//   includeRelationFromFields = true
+// }
