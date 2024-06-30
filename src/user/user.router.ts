@@ -1,21 +1,34 @@
-// src/user/user.router.ts
+import express, { Request, Response } from "express";
+import UserController from "./user.controller";
 
-import express from "express";
-import * as UserController from "./user.controller";
-import { userToken, adminToken } from "../middleware/jwt";
+const router = express.Router();
+const userController = new UserController();
 
-export const userRouter = express.Router();
+// GET /users
+router.get("/", userController.listUsers);
 
-userRouter.get("/all", UserController.listUsers);
-userRouter.get("/:id", UserController.getUserById);
-userRouter.get("/name/:name", UserController.getUserByName);
-userRouter.get("/mail/:mail", UserController.getUserByMail);
-userRouter.post("/signup", UserController.signup);
-userRouter.post("/login", UserController.login);
-userRouter.put("/:id", userToken, UserController.updateUser);
-userRouter.put("/pro/:id", userToken, UserController.sentinelUnlock);
+// GET /users/:id
+router.get("/:id", userController.getUserById);
 
-// Admin routes
-userRouter.put("/admin/:id", adminToken, UserController.updateUser);
-userRouter.delete("/:id", userToken, UserController.deleteUser);
-userRouter.delete("/admin/:id", adminToken, UserController.deleteUser);
+// GET /users/name/:name
+router.get("/name/:name", userController.getUserByName);
+
+// GET /users/mail/:mail
+router.get("/mail/:mail", userController.getUserByMail);
+
+// POST /users/signup
+router.post("/signup", userController.signup);
+
+// POST /users/login
+router.post("/login", userController.login);
+
+// PUT /users/:id
+router.put("/:id", userController.updateUser);
+
+// PUT /users/sentinel/:id
+router.put("/sentinel/:id", userController.sentinelUnlock);
+
+// DELETE /users/:id
+router.delete("/:id", userController.deleteUser);
+
+export default router;
