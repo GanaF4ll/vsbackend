@@ -1,34 +1,46 @@
-import express, { Request, Response } from "express";
-import UserController from "./user.controller";
+import { Router } from "express";
+import { userToken, adminToken } from "../middleware/jwt";
+import userController from "./user.controller";
 
-const router = express.Router();
-const userController = new UserController();
+export const userRouter = Router();
 
-// GET /users
-router.get("/", userController.listUsers);
+userRouter.get("/all", userController.listUsers.bind(userController));
+userRouter.get("/:id", userController.getUserById.bind(userController));
+userRouter.get(
+  "/name/:name",
+  userController.getUserByName.bind(userController)
+);
+userRouter.get(
+  "/mail/:mail",
+  userController.getUserByMail.bind(userController)
+);
+userRouter.post("/signup", userController.signup.bind(userController));
+userRouter.post("/login", userController.login.bind(userController));
 
-// GET /users/:id
-router.get("/:id", userController.getUserById);
+userRouter.put(
+  "/:id",
+  userToken,
+  userController.updateUser.bind(userController)
+);
+userRouter.put(
+  "/pro/:id",
+  userToken,
+  userController.sentinelUnlock.bind(userController)
+);
 
-// GET /users/name/:name
-router.get("/name/:name", userController.getUserByName);
-
-// GET /users/mail/:mail
-router.get("/mail/:mail", userController.getUserByMail);
-
-// POST /users/signup
-router.post("/signup", userController.signup);
-
-// POST /users/login
-router.post("/login", userController.login);
-
-// PUT /users/:id
-router.put("/:id", userController.updateUser);
-
-// PUT /users/sentinel/:id
-router.put("/sentinel/:id", userController.sentinelUnlock);
-
-// DELETE /users/:id
-router.delete("/:id", userController.deleteUser);
-
-export default router;
+// Admin routes
+userRouter.put(
+  "/admin/:id",
+  adminToken,
+  userController.updateUser.bind(userController)
+);
+userRouter.delete(
+  "/:id",
+  userToken,
+  userController.deleteUser.bind(userController)
+);
+userRouter.delete(
+  "/admin/:id",
+  adminToken,
+  userController.deleteUser.bind(userController)
+);
