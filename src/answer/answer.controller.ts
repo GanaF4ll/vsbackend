@@ -22,6 +22,34 @@ class AnswerController extends Controller {
     }
   );
 
+  public getAnswersByQuestion = this.handleRequest(
+    async (req: Request, res: Response) => {
+      const question_id = parseInt(req.params.question_id);
+      const answers = await db.answers.findMany({ where: { question_id } });
+      if (answers.length === 0) {
+        res.status(404).json({ message: "No answers found for this question" });
+        return;
+      }
+      res.status(200).json(answers);
+    }
+  );
+
+  public getValidAnswersByQuestion = this.handleRequest(
+    async (req: Request, res: Response) => {
+      const question_id = parseInt(req.params.question_id);
+      const answers = await db.answers.findMany({
+        where: { question_id, valid: true },
+      });
+      if (answers.length === 0) {
+        res
+          .status(404)
+          .json({ message: "No valid answers found for this question" });
+        return;
+      }
+      res.status(200).json(answers);
+    }
+  );
+
   public createAnswer = this.handleRequest(
     async (req: Request, res: Response) => {
       const { question_id, content, valid } = req.body;
