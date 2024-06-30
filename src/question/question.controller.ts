@@ -22,6 +22,20 @@ class QuestionController extends Controller {
     }
   );
 
+  public getQuestionByChapter = this.handleRequest(
+    async (req: Request, res: Response) => {
+      const chapter_id = parseInt(req.params.chapter_id);
+      const questions = await db.questions.findMany({ where: { chapter_id } });
+      if (questions.length === 0) {
+        res
+          .status(404)
+          .json({ message: "No questions found for this chapter" });
+        return;
+      }
+      res.status(200).json(questions);
+    }
+  );
+
   public createQuestion = this.handleRequest(
     async (req: Request, res: Response) => {
       const { chapter_id, content } = req.body;
