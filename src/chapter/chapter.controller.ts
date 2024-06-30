@@ -1,9 +1,10 @@
 import { db } from "../app";
 import { Request, Response } from "express";
+import { Controller } from "../models/controller";
 
-class ChapterController {
-  public async listChapters(req: Request, res: Response) {
-    try {
+class ChapterController extends Controller {
+  public listChapters = this.handleRequest(
+    async (req: Request, res: Response) => {
       const chapters = await db.chapters.findMany({
         select: {
           id: true,
@@ -15,41 +16,32 @@ class ChapterController {
         },
       });
       res.status(200).json(chapters);
-    } catch (error: any) {
-      console.error(error);
-      res.status(500).json({ message: "No chapters found" });
     }
-  }
+  );
 
-  public async getChapterById(req: Request, res: Response) {
-    const id = parseInt(req.params.id);
-    try {
-      const chapter = await db.chapters.findUnique({
-        where: { id },
-      });
+  public getChapterById = this.handleRequest(
+    async (req: Request, res: Response) => {
+      const id = parseInt(req.params.id);
+      const chapter = await db.chapters.findUnique({ where: { id } });
+      if (!chapter) {
+        res.status(404).json({ message: "Chapter not found" });
+        return;
+      }
       res.status(200).json(chapter);
-    } catch (error: any) {
-      console.error(error);
-      res.status(500).json({ message: "No chapters found" });
     }
-  }
+  );
 
-  public async getChapterByFormation(req: Request, res: Response) {
-    try {
+  public getChapterByFormation = this.handleRequest(
+    async (req: Request, res: Response) => {
       const formation_id = parseInt(req.params.formation_id);
-      const chapters = await db.chapters.findMany({
-        where: { formation_id },
-      });
+      const chapters = await db.chapters.findMany({ where: { formation_id } });
       res.status(200).json(chapters);
-    } catch (error: any) {
-      console.error(error);
-      res.status(500).json({ message: "No chapters found for this formation" });
     }
-  }
+  );
 
-  public async createChapter(req: Request, res: Response) {
-    const { formation_id, title, content, chapter_number, video } = req.body;
-    try {
+  public createChapter = this.handleRequest(
+    async (req: Request, res: Response) => {
+      const { formation_id, title, content, chapter_number, video } = req.body;
       const chapter = await db.chapters.create({
         data: {
           formation: { connect: { id: formation_id } },
@@ -60,18 +52,13 @@ class ChapterController {
         },
       });
       res.status(201).json({ message: "Chapter created", chapter });
-    } catch (error: any) {
-      console.error(error);
-      res
-        .status(500)
-        .json({ message: "Chapter not created", error: error.message });
     }
-  }
+  );
 
-  public async updateChapter(req: Request, res: Response) {
-    const id = parseInt(req.params.id);
-    const { formation_id, title, content, chapter_number, video } = req.body;
-    try {
+  public updateChapter = this.handleRequest(
+    async (req: Request, res: Response) => {
+      const id = parseInt(req.params.id);
+      const { formation_id, title, content, chapter_number, video } = req.body;
       await db.chapters.update({
         where: { id },
         data: {
@@ -82,33 +69,18 @@ class ChapterController {
           video,
         },
       });
-
-      const updatedChapter = await db.chapters.findUnique({
-        where: { id },
-      });
+      const updatedChapter = await db.chapters.findUnique({ where: { id } });
       res.status(200).json(updatedChapter);
-    } catch (error: any) {
-      console.error(error);
-      res
-        .status(500)
-        .json({ message: "Chapter not updated", error: error.message });
     }
-  }
+  );
 
-  public async deleteChapter(req: Request, res: Response) {
-    const id = parseInt(req.params.id);
-    try {
-      const chapter = await db.chapters.delete({
-        where: { id },
-      });
+  public deleteChapter = this.handleRequest(
+    async (req: Request, res: Response) => {
+      const id = parseInt(req.params.id);
+      const chapter = await db.chapters.delete({ where: { id } });
       res.status(200).json({ message: "Chapter deleted", chapter });
-    } catch (error: any) {
-      console.error(error);
-      res
-        .status(500)
-        .json({ message: "No chapters found", error: error.message });
     }
-  }
+  );
 }
 
 export const chapterController = new ChapterController();
