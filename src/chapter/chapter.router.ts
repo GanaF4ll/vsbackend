@@ -1,20 +1,33 @@
 import { Router } from "express";
-import * as ChapterController from "./chapter.controller";
+import { chapterController } from "./chapter.controller";
 import { creatorToken } from "../middleware/jwt";
 
 export const chapterRouter = Router();
 
-chapterRouter.get("/all", ChapterController.listChapters);
-
-chapterRouter.get("/:id", ChapterController.getChapterById);
-
+chapterRouter.get(
+  "/all",
+  chapterController.listChapters.bind(chapterController)
+);
+chapterRouter.get(
+  "/:id",
+  chapterController.getChapterById.bind(chapterController)
+);
 chapterRouter.get(
   "/formation/:formation_id",
-  ChapterController.getChapterByFormation
+  chapterController.getChapterByFormation.bind(chapterController)
 );
-
-chapterRouter.post("/add", creatorToken, ChapterController.createChapter);
-
-chapterRouter.put("/:id", creatorToken, ChapterController.updateChapter);
-
-chapterRouter.delete("/:id", creatorToken, ChapterController.deleteChapter);
+chapterRouter.post(
+  "/add",
+  creatorToken,
+  chapterController.createChapter.bind(chapterController)
+);
+chapterRouter.put(
+  "/:id",
+  creatorToken,
+  chapterController.updateChapter.bind(chapterController)
+);
+chapterRouter.delete(
+  "/:id",
+  creatorToken,
+  chapterController.deleteChapter.bind(chapterController)
+);

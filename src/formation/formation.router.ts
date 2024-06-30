@@ -1,28 +1,41 @@
-import express from "express";
-import * as FormationController from "./formation.controller";
+import { Router } from "express";
+import { formationController } from "./formation.controller";
 import { creatorToken } from "../middleware/jwt";
 
-export const formationRouter = express.Router();
-
-formationRouter.get("/all", FormationController.listFormations);
-
-formationRouter.get("/dev/:id", FormationController.getFormationByIdDev);
-
-formationRouter.get("/:id", FormationController.getFormationById);
+export const formationRouter = Router();
 
 formationRouter.get(
-  "/category/:category_id",
-  FormationController.getFormationByCategory
+  "/all",
+  formationController.listFormations.bind(formationController)
 );
-
-formationRouter.get("/title/:title", FormationController.getFormationByTitle);
-
-formationRouter.post("/add", creatorToken, FormationController.createFormation);
-
-formationRouter.put("/:id", creatorToken, FormationController.updateFormation);
-
+formationRouter.get(
+  "/:id/dev",
+  formationController.getFormationByIdDev.bind(formationController)
+);
+formationRouter.get(
+  "/:id",
+  formationController.getFormationById.bind(formationController)
+);
+formationRouter.get(
+  "/category/:category_id",
+  formationController.getFormationByCategory.bind(formationController)
+);
+formationRouter.get(
+  "/title/:title",
+  formationController.getFormationByTitle.bind(formationController)
+);
+formationRouter.post(
+  "/add",
+  creatorToken,
+  formationController.createFormation.bind(formationController)
+);
+formationRouter.put(
+  "/:id",
+  creatorToken,
+  formationController.updateFormation.bind(formationController)
+);
 formationRouter.delete(
   "/:id",
   creatorToken,
-  FormationController.deleteFormation
+  formationController.deleteFormation.bind(formationController)
 );
