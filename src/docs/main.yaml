@@ -1,0 +1,26 @@
+openapi: 3.0.0
+info:
+  title: Virutal Sentinel API
+  version: 1.0.0
+  description: API for managing all the entities in the Virtual Sentinel project
+
+tags:
+  - name: Users
+    description: User management operations
+  - name: Formations
+    description: Formation management operations
+
+paths:
+  /users:
+    $ref: "./users.swagger.yaml"
+  /formations:
+    $ref: "./formations.swagger.yaml"
+  /chapters:
+    $ref: "./chapters.swagger.yaml"
+
+components:
+  schemas:
+    User:
+      $ref: "./users.swagger.yaml#/components/schemas/User"
+    Formation:
+      $ref: "./formations.yaml#/components/schemas/Formation"

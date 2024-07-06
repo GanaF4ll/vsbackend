@@ -1,0 +1,314 @@
+openapi: 3.0.0
+info:
+  title: Formation API
+  version: 1.0.0
+  description: API for managing formations
+
+tags:
+  - name: Formations
+    description: Formation management operations
+
+paths:
+  /formations/all:
+    get:
+      tags:
+        - Formations
+      summary: List all formations
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Formation"
+
+  /formations/{id}/dev:
+    get:
+      tags:
+        - Formations
+      summary: Get formation by ID (developer view)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FormationDev"
+        "404":
+          description: Formation not found
+
+  /formations/{id}:
+    get:
+      tags:
+        - Formations
+      summary: Get formation by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Formation"
+        "404":
+          description: Formation not found
+    put:
+      tags:
+        - Formations
+      summary: Update formation
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFormation"
+      responses:
+        "200":
+          description: Formation updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Formation"
+        "400":
+          description: Bad request
+    delete:
+      tags:
+        - Formations
+      summary: Delete formation
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Formation deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  formation:
+                    $ref: "#/components/schemas/Formation"
+
+  /formations/category/{category_id}:
+    get:
+      tags:
+        - Formations
+      summary: Get formations by category
+      parameters:
+        - in: path
+          name: category_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Formation"
+        "404":
+          description: No formations found
+
+  /formations/title/{title}:
+    get:
+      tags:
+        - Formations
+      summary: Get formations by title
+      parameters:
+        - in: path
+          name: title
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Formation"
+        "404":
+          description: No formations found
+
+  /formations/add:
+    post:
+      tags:
+        - Formations
+      summary: Create a new formation
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewFormation"
+      responses:
+        "201":
+          description: Formation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Formation"
+        "400":
+          description: Bad request
+
+components:
+  schemas:
+    Formation:
+      type: object
+      properties:
+        id:
+          type: integer
+        author_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category_id:
+          type: integer
+        difficulty:
+          type: string
+        completionTime:
+          type: string
+        qualityRating:
+          type: number
+        coverImage:
+          type: string
+        isPro:
+          type: boolean
+
+    FormationDev:
+      type: object
+      properties:
+        formation:
+          type: object
+          properties:
+            id:
+              type: integer
+            author_id:
+              type: integer
+            title:
+              type: string
+            description:
+              type: string
+            category_id:
+              type: integer
+            difficulty:
+              type: string
+            completionTime:
+              type: string
+            qualityRating:
+              type: number
+            coverImage:
+              type: string
+            isPro:
+              type: boolean
+            chapters:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  title:
+                    type: string
+                  questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        content:
+                          type: string
+                        answers:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              content:
+                                type: string
+                              valid:
+                                type: boolean
+
+    NewFormation:
+      type: object
+      properties:
+        author_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category_id:
+          type: integer
+        difficulty:
+          type: string
+        qualityRating:
+          type: number
+        completionTime:
+          type: string
+        coverImage:
+          type: string
+
+    UpdateFormation:
+      type: object
+      properties:
+        author_id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category_id:
+          type: integer
+        difficulty:
+          type: string
+        qualityRating:
+          type: number
+        completionTime:
+          type: string
+        coverImage:
+          type: string
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

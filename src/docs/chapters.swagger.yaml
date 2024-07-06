@@ -1,0 +1,200 @@
+openapi: 3.0.0
+info:
+  title: Chapter API
+  version: 1.0.0
+  description: API for managing chapters
+
+tags:
+  - name: Chapters
+    description: Chapter management operations
+
+paths:
+  /chapters/all:
+    get:
+      tags:
+        - Chapters
+      summary: List all chapters
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Chapter"
+
+  /chapters/{id}:
+    get:
+      tags:
+        - Chapters
+      summary: Get chapter by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chapter"
+        "404":
+          description: Chapter not found
+
+    put:
+      tags:
+        - Chapters
+      summary: Update a chapter
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateChapter"
+      responses:
+        "200":
+          description: Chapter updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chapter"
+        "400":
+          description: Bad request
+
+    delete:
+      tags:
+        - Chapters
+      summary: Delete a chapter
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Chapter deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  chapter:
+                    $ref: "#/components/schemas/Chapter"
+
+  /chapters/formation/{formation_id}:
+    get:
+      tags:
+        - Chapters
+      summary: Get chapters by formation ID
+      parameters:
+        - in: path
+          name: formation_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Chapter"
+        "404":
+          description: No chapters found for the given formation ID
+
+  /chapters/add:
+    post:
+      tags:
+        - Chapters
+      summary: Create a new chapter
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NewChapter"
+      responses:
+        "201":
+          description: Chapter created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Chapter"
+        "400":
+          description: Bad request
+
+components:
+  schemas:
+    Chapter:
+      type: object
+      properties:
+        id:
+          type: integer
+        formation_id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        chapter_number:
+          type: integer
+        video:
+          type: string
+
+    NewChapter:
+      type: object
+      properties:
+        formation_id:
+          type: integer
+          required: true
+        title:
+          type: string
+          required: true
+        content:
+          type: string
+          required: true
+        chapter_number:
+          type: integer
+          required: true
+        video:
+          type: string
+
+    UpdateChapter:
+      type: object
+      properties:
+        formation_id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        chapter_number:
+          type: integer
+        video:
+          type: string
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer

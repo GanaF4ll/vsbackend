@@ -2,6 +2,10 @@ import express, { Request, Response, NextFunction } from "express";
 import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import cors from "cors";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
+import path from "path";
+import swaggerJsdoc from "swagger-jsdoc";
 
 import { userRouter } from "./user/user.router";
 import { roleRouter } from "./role/role.router";
@@ -32,6 +36,25 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || process.env.TEST_PORT;
 
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Virutal Sentinel API",
+      version: "1.0.0",
+      description:
+        "API for managing all the entities in the Virtual Sentinel project",
+    },
+  },
+
+  apis: [
+    path.join(__dirname, "./docs/main.yaml"),
+    path.join(__dirname, "./docs/*.yaml"),
+  ],
+};
+
+const swaggerSpec = swaggerJsdoc(options);
+
 app.use(cors());
 
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -51,6 +74,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/users", userRouter);
 app.use("/roles", roleRouter);
