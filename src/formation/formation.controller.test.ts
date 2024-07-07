@@ -105,12 +105,12 @@ describe("FormationController", () => {
 
     await db.$disconnect();
     if (runningServer) {
-      await new Promise<void>((resolve, reject) => {
+      await new Promise((resolve, reject) => {
         runningServer.close((err: Error) => {
           if (err) {
             reject(err);
           } else {
-            resolve();
+            resolve(true);
           }
         });
       });

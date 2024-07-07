@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 
 describe("UserController", () => {
   let userMock: any;
+  let token: string;
 
   beforeAll(async () => {
     await db.$connect();
@@ -30,6 +31,12 @@ describe("UserController", () => {
         gender: "male",
       },
     });
+
+    const loginRes = await request(app).post("/users/login").send({
+      mail: userMock.mail,
+      password: plainPassword,
+    });
+    token = loginRes.body.token;
   });
 
   afterEach(async () => {
@@ -254,6 +261,78 @@ describe("UserController", () => {
 
       expect(res.status).toBe(401);
       expect(res.body).toEqual({ message: "Invalid mail or password" });
+    });
+  });
+
+  ////////////////////////////////////////
+  /////////////////PUT////////////////////
+  ////////////////////////////////////////
+
+  describe("updateUser", () => {
+    it("should update a user successfully", async () => {
+      const res = await request(app)
+        .put(`/users/${userMock.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          firstName: "Updated",
+          lastName: "User",
+          mail: "updated.user@example.com",
+          password: "NewPassword?24",
+          role_id: 2,
+          gender: "female",
+          birthdate: "1992-01-01",
+        });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          id: userMock.id,
+          firstName: "Updated",
+          lastName: "User",
+          mail: "updated.user@example.com",
+          role_id: 2,
+          gender: "female",
+          birthdate: "1992-01-01T00:00:00.000Z",
+        })
+      );
+    });
+
+    it("should return an error if the password is not strong enough", async () => {
+      const res = await request(app)
+        .put(`/users/${userMock.id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          firstName: "Updated",
+          lastName: "User",
+          mail: "updated.user@example.com",
+          password: "weakpass",
+          role_id: 2,
+          gender: "female",
+          birthdate: "1992-01-01",
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body).toEqual({
+        message: "ERROR: Password is not strong enough!",
+      });
+    });
+
+    it("should return 404 if user to be updated does not exist", async () => {
+      const res = await request(app)
+        .put("/users/9999")
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          firstName: "Updated",
+          lastName: "User",
+          mail: "updated.user@example.com",
+          password: "NewPassword?24",
+          role_id: 2,
+          gender: "female",
+          birthdate: "1992-01-01",
+        });
+
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({ message: "No user found with that id" });
     });
   });
 });
