@@ -10,10 +10,8 @@ describe("FormationController", () => {
   let questionMock: any;
   let answerMock: any;
   let token: string;
-  let runningServer: any;
 
   beforeAll(async () => {
-    runningServer = server.listen();
     await db.$connect();
     const plainPassword = "Password?24";
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
@@ -104,17 +102,7 @@ describe("FormationController", () => {
     await db.categories.delete({ where: { id: categoryMock.id } });
 
     await db.$disconnect();
-    if (runningServer) {
-      await new Promise((resolve, reject) => {
-        runningServer.close((err: Error) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(true);
-          }
-        });
-      });
-    }
+    server.close();
   });
 
   ////////////////////////////////////////
