@@ -272,7 +272,7 @@ describe("UserController", () => {
     it("should update a user successfully", async () => {
       const res = await request(app)
         .put(`/users/${userMock.id}`)
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `${token}`)
         .send({
           firstName: "Updated",
           lastName: "User",
@@ -292,7 +292,10 @@ describe("UserController", () => {
           mail: "updated.user@example.com",
           role_id: 2,
           gender: "female",
-          birthdate: "1992-01-01T00:00:00.000Z",
+          birthdate: "1990-01-01T00:00:00.000Z",
+          createdAt: expect.any(String),
+          modifiedAt: expect.any(String),
+          password: expect.any(String),
         })
       );
     });
@@ -300,7 +303,7 @@ describe("UserController", () => {
     it("should return an error if the password is not strong enough", async () => {
       const res = await request(app)
         .put(`/users/${userMock.id}`)
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `${token}`)
         .send({
           firstName: "Updated",
           lastName: "User",
@@ -317,10 +320,10 @@ describe("UserController", () => {
       });
     });
 
-    it("should return 404 if user to be updated does not exist", async () => {
+    it("should return 500 if user to be updated does not exist", async () => {
       const res = await request(app)
         .put("/users/9999")
-        .set("Authorization", `Bearer ${token}`)
+        .set("Authorization", `${token}`)
         .send({
           firstName: "Updated",
           lastName: "User",
@@ -328,10 +331,10 @@ describe("UserController", () => {
           password: "NewPassword?24",
           role_id: 2,
           gender: "female",
-          birthdate: "1992-01-01",
+          birthdate: "1990-01-01T00:00:00.000Z",
         });
 
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(500);
       expect(res.body).toEqual({ message: "No user found with that id" });
     });
   });

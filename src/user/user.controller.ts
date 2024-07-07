@@ -168,8 +168,6 @@ class UserController extends Controller {
       let birthdate: Date;
       if (req.body.birthdate) {
         birthdate = new Date(req.body.birthdate);
-      } else {
-        birthdate = new Date();
       }
 
       await db.users.update({
@@ -187,6 +185,11 @@ class UserController extends Controller {
       const updatedUser = await db.users.findUnique({
         where: { id: parseInt(id) },
       });
+
+      if (!updatedUser) {
+        res.status(404).json({ message: "No user found with that id" });
+        return;
+      }
 
       res.status(200).json(updatedUser);
     }
