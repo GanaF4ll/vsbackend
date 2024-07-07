@@ -10,8 +10,10 @@ describe("FormationController", () => {
   let questionMock: any;
   let answerMock: any;
   let token: string;
+  let runningServer: any;
 
   beforeAll(async () => {
+    runningServer = server.listen();
     await db.$connect();
     const plainPassword = "Password?24";
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
@@ -21,21 +23,23 @@ describe("FormationController", () => {
         firstName: "Ryomen",
         lastName: "Sukuna",
         birthdate: new Date("1990-01-01"),
-        password: hashedPassword,
+        password: plainPassword,
         mail: "ryomen.sukuna@example.com",
         role_id: 1,
         gender: "male",
       },
     });
 
-    // const loginRes = await request(app).post("users/login").send({
-    //   email: userMock.mail,
-    //   password: hashedPassword,
-    // });
+    const loginRes = await request(app).post("/users/login").send({
+      mail: userMock.mail,
+      password: plainPassword,
+    });
 
-    // token = loginRes.body.token;
+    token = loginRes.body.token;
+    console.log("res: ", loginRes.body);
     // console.log("Generated token:", token);
     // console.log("userMockmail:", userMock.mail);
+    // console.log("password:", hashedPassword);
 
     categoryMock = await db.categories.create({
       data: {
@@ -96,11 +100,21 @@ describe("FormationController", () => {
       await db.formations.delete({ where: { id: formationMock.id } });
     }
 
+    await db.formations.deleteMany({ where: { category_id: categoryMock.id } });
     await db.categories.delete({ where: { id: categoryMock.id } });
-    await db.users.delete({ where: { id: userMock.id } });
 
     await db.$disconnect();
-    server.close();
+    if (runningServer) {
+      await new Promise<void>((resolve, reject) => {
+        runningServer.close((err: Error) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    }
   });
 
   ////////////////////////////////////////
@@ -195,37 +209,40 @@ describe("FormationController", () => {
   /////////////////POST///////////////////
   ////////////////////////////////////////
 
-  // describe("createFormation", () => {
-  //   it("should create a new formation", async () => {
-  //     const res = await request(app)
-  //       .post("/formations/add")
-  //       .set("Authorization", `Bearer ${token}`)
-  //       .send({
-  //         author_id: userMock.id,
-  //         title: formationMock.title,
-  //         description: formationMock.description,
-  //         video: formationMock.video,
-  //         category_id: categoryMock.id,
-  //         difficulty: formationMock.difficulty,
-  //         qualityRating: formationMock.qualityRating,
-  //         completionTime: formationMock.completionTime,
-  //         coverImage: formationMock.coverImage,
-  //       });
+  describe("createFormation", () => {
+    it("should create a new formation", async () => {
+      const res = await request(app)
+        .post("/formations/add")
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          author_id: userMock.id,
+          title: formationMock.title,
+          description: formationMock.description,
+          video: formationMock.video,
+          category_id: categoryMock.id,
+          difficulty: formationMock.difficulty,
+          qualityRating: formationMock.qualityRating,
+          completionTime: formationMock.completionTime,
+          coverImage: formationMock.coverImage,
+        });
 
-  //     expect(res.status).toBe(201);
-  //     expect(res.body).toEqual(
-  //       expect.objectContaining({
-  //         id: expect.any(Number),
-  //         title: formationMock.title,
-  //         description: formationMock.description,
-  //         difficulty: formationMock.difficulty,
-  //         completionTime: formationMock.completionTime,
-  //         qualityRating: formationMock.qualityRating,
-  //         coverImage: expect.stringContaining("mock"),
-  //         author_id: userMock.id,
-  //         category_id: categoryMock.id,
-  //       })
-  //     );
-  //   });
-  // });
+      expect(res.status).toBe(201);
+      expect(res.body).toEqual(
+        expect.objectContaining({
+          id: expect.any(Number),
+          title: formationMock.title,
+          description: formationMock.description,
+          difficulty: formationMock.difficulty,
+          completionTime: formationMock.completionTime,
+          qualityRating: formationMock.qualityRating,
+          coverImage: expect.any(String),
+          author_id: userMock.id,
+          category_id: categoryMock.id,
+          createdAt: expect.any(String),
+          isPro: expect.any(Boolean),
+          modifiedAt: expect.any(String),
+        })
+      );
+    });
+  });
 });

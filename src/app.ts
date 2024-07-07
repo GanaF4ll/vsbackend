@@ -86,6 +86,17 @@ app.use("/chapters", chapterRouter);
 app.use("/questions", questionRouter);
 app.use("/answers", answerRouter);
 
-export const server = app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+export const server = {
+  listen: () => {
+    return app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  },
+  close: () => {
+    return new Promise<void>((resolve) => {
+      app.listen().close(() => {
+        resolve();
+      });
+    });
+  },
+};

@@ -185,7 +185,7 @@ describe("UserController", () => {
 
       expect(res.status).toBe(400);
       expect(res.body).toEqual({
-        message: "ERROR: User already exists !",
+        message: "ERROR: User already exists!",
       });
 
       // Clean up
@@ -253,7 +253,7 @@ describe("UserController", () => {
       });
 
       expect(res.status).toBe(401);
-      expect(res.body).toEqual({ message: "Invalid password" });
+      expect(res.body).toEqual({ message: "Invalid mail or password" });
     });
   });
 });
