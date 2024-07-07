@@ -170,28 +170,39 @@ class UserController extends Controller {
         birthdate = new Date(req.body.birthdate);
       }
 
-      await db.users.update({
-        where: { id: parseInt(id) },
-        data: {
-          firstName,
-          lastName,
-          mail,
-          password: await bcrypt.hash(password, 10),
-          role_id,
-          gender,
-        },
-      });
+      try {
+        await db.users.update({
+          where: { id: parseInt(id) },
+          data: {
+            firstName,
+            lastName,
+            mail,
+            password: await bcrypt.hash(password, 10),
+            role_id,
+            gender,
+          },
+        });
 
-      const updatedUser = await db.users.findUnique({
-        where: { id: parseInt(id) },
-      });
+        const updatedUser = await db.users.findUnique({
+          where: { id: parseInt(id) },
+        });
 
-      if (!updatedUser) {
-        res.status(404).json({ message: "No user found with that id" });
-        return;
+        if (!updatedUser) {
+          res.status(404).json({ message: "No user found with that id" });
+          return;
+        }
+
+        res.status(200).json(updatedUser);
+      } catch (error: any) {
+        if (error.code === "P2025") {
+          res.status(404).json({ message: "No user found with that id" });
+        } else {
+          console.error("Error details:", error);
+          res
+            .status(500)
+            .json({ message: error.message || "An error occurred" });
+        }
       }
-
-      res.status(200).json(updatedUser);
     }
   );
 

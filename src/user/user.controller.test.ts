@@ -320,7 +320,7 @@ describe("UserController", () => {
       });
     });
 
-    it("should return 500 if user to be updated does not exist", async () => {
+    it("should return 404 if user to be updated does not exist", async () => {
       const res = await request(app)
         .put("/users/9999")
         .set("Authorization", `${token}`)
@@ -334,7 +334,7 @@ describe("UserController", () => {
           birthdate: "1990-01-01T00:00:00.000Z",
         });
 
-      expect(res.status).toBe(500);
+      expect(res.status).toBe(404);
       expect(res.body).toEqual({ message: "No user found with that id" });
     });
   });
